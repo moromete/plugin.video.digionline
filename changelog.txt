@@ -1,2 +1,5 @@
+v 0.0.2
+  1. fix "requests" module dependency
+
 v 0.0.1
   1. first release
