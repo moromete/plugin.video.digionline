@@ -3,7 +3,7 @@ plugin.video.digionline
 
 Watch Tv based on your DigiOnline account
 
-Atention !!!
-RDS make this streams available only on RDS network!
+Atention!!!
+RDS streams are available only on RDS network!
 
 
