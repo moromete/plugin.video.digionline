@@ -38,7 +38,6 @@ class Digi():
       request = urllib2.Request(self.siteUrl, None, self.headers)
       response = self.opener.open(request)
       # print(response.read())
-      return response.read()
     else:
       request = urllib2.Request(self.siteUrl + '/auth/login', None, self.headers)
       response = self.opener.open(request)
@@ -59,8 +58,18 @@ class Digi():
       response = self.opener.open(request)
       self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
       #print(response.read())
-      return response.read()
-  
+    
+   
+    landedUrl = url = response.geturl()
+    if(landedUrl == self.siteUrl + '/auth/login'):
+      print('Login error')
+      return
+
+    # print(response.info())
+    # print(response.geturl())
+    # print(response.getcode())
+    return response.read()
+
   def getPage(self, url, data=None, xhr=False):
     if (data != None):
       data = urllib.urlencode(data)
@@ -73,6 +82,9 @@ class Digi():
     return response.read()
 
   def scrapCats(self, html):
+    if(html == None):
+      return
+    # print(html)
     soup = BeautifulSoup(html, "html.parser")
     catLinks = soup.find_all('a', class_="nav-menu-item-link", href=True)
     # print(catLinks)
@@ -126,6 +138,9 @@ class Digi():
     # print(html)
     soup = BeautifulSoup(html, "html.parser")
     player = soup.select("[class*=video-player] > script")
+    # print(player)
+    if(len(player) == 0):
+      return
     jsonStr = player[0].text.strip()
     # print(jsonStr)
     chData = json.loads(jsonStr)

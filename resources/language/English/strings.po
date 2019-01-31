@@ -34,3 +34,15 @@ msgstr ""
 msgctxt "#30013"
 msgid "Error"
 msgstr ""
+
+msgctxt "#30014"
+msgid "Reset login (in case you changed login credetials or you want to register as new device)"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Login error"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Please verify your user name and password or check if you do not have to many devices registered on your account or your login data needs reset from addon setting!"
+msgstr ""

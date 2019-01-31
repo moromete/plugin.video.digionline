@@ -27,8 +27,18 @@ def addLink(name, url, logo, mode):
   return ok
 
 def listCat():
+  if(addon.getSetting('reset_login') == 'true'):
+    os.remove(cookieFile)
+    addon.setSetting(id='reset_login', value='false')
+
   digi = Digi(cookieFile = cookieFile)
   html = digi.login(addon.getSetting('username'), addon.getSetting('password'))
+
+  if(html == None):
+    addon_log('Login error')
+    xbmcgui.Dialog().ok(addon.getLocalizedString(30015), addon.getLocalizedString(30016))
+    return
+
   cats = digi.scrapCats(html)
 
   for cat in cats:

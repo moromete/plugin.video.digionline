@@ -1,3 +1,0 @@
-#LWP-Cookies-2.0
-Set-Cookie3: DOSESSV3PRI=1C3668DB61A34B189DB1FD1199EC5176A8BFA077A5824405; path="/"; domain=".digionline.ro"; path_spec; discard; HttpOnly=None; version=0
-Set-Cookie3: deviceId="b73461755149ba456caef6a725491ec2.Firefox_60_GNU_Linux_411143c0599f5be4f6b4448cefc7ddf4_PCBROWSER"; path="/"; domain="www.digionline.ro"; path_spec; expires="2029-01-27 15:07:26Z"; version=0
