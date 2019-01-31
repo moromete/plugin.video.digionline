@@ -1,3 +1,8 @@
+v 0.0.3
+  1. add setting to reset login data
+     If the username and password is changed this setting must be enabled to clear the cookie information and register again as new device.
+  2. error message in case of invalid login
+
 v 0.0.2
   1. fix "requests" module dependency
 
