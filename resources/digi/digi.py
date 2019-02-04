@@ -146,6 +146,7 @@ class Digi():
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
     chId = chData['new-info']['meta']['streamId']
+    abr = chData['new-info']['meta']['abr']
     
     if(chData['shortcode'] == 'livestream'):
       data = {
@@ -158,8 +159,10 @@ class Digi():
         'id_stream': chId,
         'quality': None 
       }
-    arrQuality = ['abr', 'hq', 'mq', 'lq']
-    # arrQuality = ['abr']
+    if(abr):
+      arrQuality = ['abr', 'hq', 'mq', 'lq']
+    else:
+      arrQuality = ['hq', 'mq', 'lq']
     for q in arrQuality:
       data['quality'] = q
       # print(data)
