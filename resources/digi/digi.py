@@ -187,49 +187,49 @@ class Digi():
     return {'url': url,
             'err': err}
 
-  def digiFilm(self):
-    import ssl
-    ssl._create_default_https_context = ssl._create_unverified_context
+  # def digiFilm(self):
+  #   import ssl
+  #   ssl._create_default_https_context = ssl._create_unverified_context
 
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookieJar))
-    logindata = urllib.urlencode({
-      'user': 'c_dabija@yahoo.com',
-      'password': 'milenium',
-      'browser': 'chrome',
-      'model': '61',
-      'os': 'macintel'
-    })
-    url = 'https://www.digi-online.ro/xhr-login.php'
-    request = urllib2.Request(url, logindata)
-    request.add_header('Content-Type', 'application/x-www-form-urlencoded')
-    request.add_header('X-Requested-With', 'XMLHttpRequest')
-    response = opener.open(request)
-    # print(response.read())
-    self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+  #   opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookieJar))
+  #   logindata = urllib.urlencode({
+  #     'user': 'c_dabija@yahoo.com',
+  #     'password': 'milenium',
+  #     'browser': 'chrome',
+  #     'model': '61',
+  #     'os': 'macintel'
+  #   })
+  #   url = 'https://www.digi-online.ro/xhr-login.php'
+  #   request = urllib2.Request(url, logindata)
+  #   request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+  #   request.add_header('X-Requested-With', 'XMLHttpRequest')
+  #   response = opener.open(request)
+  #   # print(response.read())
+  #   self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
 
     
-    url = 'https://www.digi-online.ro/xhr-gen-stream.php'
-    data = urllib.urlencode({'scope': 'digifilm'})
-    # data = None
-    request = urllib2.Request(url, data)
-    request.add_header('Content-Type', 'application/x-www-form-urlencoded')
-    request.add_header('X-Requested-With', 'XMLHttpRequest')
-    response = opener.open(request)
-    # print(response.read())
+  #   url = 'https://www.digi-online.ro/xhr-gen-stream.php'
+  #   data = urllib.urlencode({'scope': 'digifilm'})
+  #   # data = None
+  #   request = urllib2.Request(url, data)
+  #   request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+  #   request.add_header('X-Requested-With', 'XMLHttpRequest')
+  #   response = opener.open(request)
+  #   # print(response.read())
 
-    self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+  #   self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
 
 
-    stream_Quality = 'hq'
-    # device_id = self.getCookie('device_id')
-    device_id = 'chrome_61_macintel_333806a4cf23e251087b9da0892b177c_PCBROWSER'
-    deviceOS='macintel'
-    browser = 'chrome'
-    deviceModel = '61'
-    url = 'https://digiapis.rcs-rds.ro/digionline/api/v11/streams_l.php?action=getStream&id_stream=7&quality=' + stream_Quality + '&id_device=' + device_id + '&platform=Browser&version_platform='+ deviceOS + '_' + browser + '_' + deviceModel + '&version_app=1.0.0&cd=0'
-    print(url)
-    request = urllib2.Request(url, None)
-    request.add_header('Referer', 'http://www.digi-online.ro/digifilm-player')
-    response = opener.open(request)
-    print(response.read())
+  #   stream_Quality = 'hq'
+  #   # device_id = self.getCookie('device_id')
+  #   device_id = 'chrome_61_macintel_333806a4cf23e251087b9da0892b177c_PCBROWSER'
+  #   deviceOS='macintel'
+  #   browser = 'chrome'
+  #   deviceModel = '61'
+  #   url = 'https://digiapis.rcs-rds.ro/digionline/api/v11/streams_l.php?action=getStream&id_stream=7&quality=' + stream_Quality + '&id_device=' + device_id + '&platform=Browser&version_platform='+ deviceOS + '_' + browser + '_' + deviceModel + '&version_app=1.0.0&cd=0'
+  #   print(url)
+  #   request = urllib2.Request(url, None)
+  #   request.add_header('Referer', 'http://www.digi-online.ro/digifilm-player')
+  #   response = opener.open(request)
+  #   print(response.read())
 
