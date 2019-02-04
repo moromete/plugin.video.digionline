@@ -146,7 +146,9 @@ class Digi():
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
     chId = chData['new-info']['meta']['streamId']
-    abr = chData['new-info']['meta']['abr']
+    abr = False
+    if hasattr(chData['new-info']['meta'], 'abr'):
+      abr = chData['new-info']['meta']['abr']
     
     if(chData['shortcode'] == 'livestream'):
       data = {
