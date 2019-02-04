@@ -1,5 +1,6 @@
 v 0.0.4
   1. detect abr quality
+  2. add setting to choose quality before play
 
 v 0.0.3
   1. add setting to reset login data

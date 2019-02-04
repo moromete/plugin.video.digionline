@@ -133,7 +133,7 @@ class Digi():
     except:
       return None
 
-  def scrapPlayUrl(self, url):
+  def scrapPlayUrl(self, url, quality = None):
     html = self.getPage(url)
     # print(html)
     soup = BeautifulSoup(html, "html.parser")
@@ -146,10 +146,18 @@ class Digi():
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
     chId = chData['new-info']['meta']['streamId']
-    abr = False
-    if hasattr(chData['new-info']['meta'], 'abr'):
-      abr = chData['new-info']['meta']['abr']
-    
+    #detect Quality or try the manualy choosed one
+    if(quality != None):
+      arrQuality = [quality]
+    else: 
+      abr = False
+      if hasattr(chData['new-info']['meta'], 'abr'):
+        abr = chData['new-info']['meta']['abr']
+      if(abr):
+        arrQuality = ['abr', 'hq', 'mq', 'lq']
+      else:
+        arrQuality = ['hq', 'mq', 'lq']
+
     if(chData['shortcode'] == 'livestream'):
       data = {
         'id_stream': chId,
@@ -161,10 +169,6 @@ class Digi():
         'id_stream': chId,
         'quality': None 
       }
-    if(abr):
-      arrQuality = ['abr', 'hq', 'mq', 'lq']
-    else:
-      arrQuality = ['hq', 'mq', 'lq']
     for q in arrQuality:
       data['quality'] = q
       # print(data)
