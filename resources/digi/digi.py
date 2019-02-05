@@ -37,6 +37,8 @@ class Digi():
     if(self.getCookie('deviceId') != None):
       request = urllib2.Request(self.siteUrl, None, self.headers)
       response = self.opener.open(request)
+Introdu parola contului tau eMAG
+
       # print(response.read())
     else:
       request = urllib2.Request(self.siteUrl + '/auth/login', None, self.headers)
