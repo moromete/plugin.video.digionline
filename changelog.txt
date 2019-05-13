@@ -1,3 +1,6 @@
+v 0.0.6
+  1. reset login if cookie is not valid anymore (can lead to to many devices linked into your account)
+
 v 0.0.4
   1. detect abr quality
   2. add setting to choose quality before play
