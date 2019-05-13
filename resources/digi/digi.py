@@ -1,10 +1,12 @@
 import urllib, urllib2
 import cookielib
+import os
 
 import re
 from bs4 import BeautifulSoup
 import json
 import requests.utils
+from common import *
 
 class Digi():
 
@@ -37,6 +39,8 @@ class Digi():
     if(self.getCookie('deviceId') != None):
       request = urllib2.Request(self.siteUrl, None, self.headers)
       response = self.opener.open(request)
+      # addon_log(self.siteUrl)
+      # addon_log(response)
       # print(response.read())
     else:
       request = urllib2.Request(self.siteUrl + '/auth/login', None, self.headers)
@@ -57,18 +61,32 @@ class Digi():
       request = urllib2.Request(self.siteUrl + '/auth/login', logindata, self.headers)
       response = self.opener.open(request)
       self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
-      #print(response.read())
+      # print(response.read())
+      # addon_log(response.read())
     
    
     landedUrl = url = response.geturl()
+    # addon_log(landedUrl)
     if(landedUrl == self.siteUrl + '/auth/login'):
       print('Login error')
       return
 
+    #retry login if we get a response page with Login link in it
+    html = response.read()
+    soup = BeautifulSoup(html, "html.parser")
+    loginLink = soup.find('a', class_="header-account-login", href=True)
+    # addon_log(loginLink)
+    if(loginLink != None):
+      addon_log('Login error retry by reset login')
+      os.remove(self.cookieFile)
+      self.cookieJar = cookielib.LWPCookieJar(filename=self.cookieFile)
+      self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookieJar))
+      return self.login(username, password)
+
     # print(response.info())
     # print(response.geturl())
     # print(response.getcode())
-    return response.read()
+    return html
 
   def getPage(self, url, data=None, xhr=False):
     if (data != None):
@@ -85,8 +103,13 @@ class Digi():
     if(html == None):
       return
     # print(html)
+    # addon_log(html)
+    # f= open("test.html","w+")
+    # f.write(html)
+    # f.close() 
     soup = BeautifulSoup(html, "html.parser")
     catLinks = soup.find_all('a', class_="nav-menu-item-link", href=True)
+    # addon_log(catLinks)
     # print(catLinks)
     cats = []
     for link in catLinks:
