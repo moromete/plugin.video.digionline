@@ -113,7 +113,7 @@ class Digi():
     # print(catLinks)
     cats = []
     for link in catLinks:
-      if(link['href'] != '/'):
+      if(link['href'] != '/') and (link['href'] != '/hbo-go'):
         cats.append({'name': link['title'],
                      'url': link['href']
                     })
@@ -207,9 +207,14 @@ class Digi():
 
     err = None 
     url=None
-    if(chData['stream_url']):
+    if 'stream_url' in chData and chData['stream_url']:
       url = self.protocol + ':' + chData['stream_url']
     else:
-      err = chData['stream_err']
+      if 'data' in  chData and 'content' in chData['data'] and  'stream.manifest.url' in chData['data']['content'] and chData['data']['content']['stream.manifest.url']:
+        url = chData['data']['content']['stream.manifest.url']
+      else:
+        err = chData['error']['error_message']
+        soup = BeautifulSoup(err)
+        err = soup.get_text()
     return {'url': url,
             'err': err}

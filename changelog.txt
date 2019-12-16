@@ -1,3 +1,6 @@
+v 0.1.0
+  1. fix subscription error messages
+
 v 0.0.6
   1. reset login if cookie is not valid anymore (can lead to to many devices linked into your account)
 
