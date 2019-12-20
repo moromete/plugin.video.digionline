@@ -34,6 +34,7 @@ def listCat():
   digi = Digi(cookieFile = cookieFile)
   html = digi.login(addon.getSetting('username'), addon.getSetting('password'))
 
+  #addon_log(html)
   if(html == None):
     addon_log('Login error')
     xbmcgui.Dialog().ok(addon.getLocalizedString(30015), addon.getLocalizedString(30016))

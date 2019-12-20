@@ -1,8 +1,15 @@
-import xbmc, xbmcaddon
+try:
+  import xbmc, xbmcaddon
+except ImportError:
+  xbmcaddon = None
+  addon = None
+  pass
+
 import sys
 
-addonId = 'plugin.video.digionline'
-addon = xbmcaddon.Addon(id=addonId)
+if (xbmcaddon):
+  addonId = 'plugin.video.digionline'
+  addon = xbmcaddon.Addon(id=addonId)
 
 def getParams():
   param=[]
@@ -24,7 +31,7 @@ def getParams():
   return param
 
 def addon_log(string):
-  if addon.getSetting('debug') == 'true':
+  if addon and addon.getSetting('debug') == 'true':
     if isinstance(string, unicode):
       string = string.encode('utf-8')
     xbmc.log("[%s-%s]: %s" %(addonId, addon.getAddonInfo('version'), string))
