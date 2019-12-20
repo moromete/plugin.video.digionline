@@ -1,3 +1,6 @@
+v 0.0.6
+  1, fixed html entities in name
+
 v 0.0.4
   1. detect abr quality
   2. add setting to choose quality before play
