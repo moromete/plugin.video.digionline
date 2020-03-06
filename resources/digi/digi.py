@@ -8,6 +8,8 @@ import json
 import requests.utils
 from common import *
 
+from common import *
+
 class Digi():
 
   protocol = 'https'
@@ -129,19 +131,32 @@ class Digi():
     boxs = soup.find_all(class_="box-content")
     channels = []
     for box in boxs:
-      soup = BeautifulSoup(str(box.contents), "html.parser")
-      # url
-      chLink = soup.find('a', class_="box-link", href=True)
-      chUrl = chLink['href']
-      # name
-      chName = soup.find('h5')
-      chName = chName.text
-      chName = chName.replace('\\n', '')
-      chName = re.sub(r'\s+', ' ', chName)
-      chName = chName.strip()
-      # logo
-      logo = soup.find('img', alt="logo", src=True)
-      logoUrl = logo['src']
+      #soup = BeautifulSoup(str(box.contents), "html.parser")
+      for cnt in box.contents:
+        cntString = cnt.encode('utf-8')
+        soup = BeautifulSoup(cntString, "html.parser")
+      
+        # url
+        chLink = soup.find('a', class_="box-link", href=True)
+        if(chLink):
+          chUrl = chLink['href']
+
+        # name
+        chNameNode = soup.find('h5')
+        if(chNameNode):
+          chName = chNameNode.string
+          chName = chName.replace('\\n', '')
+          chName = re.sub('\s+', ' ', chName)
+          chName = re.sub('&period', '.', chName)
+          chName = re.sub('&colon', ':', chName)
+          chName = re.sub('&comma', ',', chName)
+          # chName = re.sub('&\w+', ' ', chName)
+          # chName = chName.strip()
+          
+        # logo
+        logo = soup.find('img', alt="logo", src=True)
+        if(logo):
+          logoUrl = logo['src']
 
       channels.append({'name': chName,
                        'url': chUrl,
