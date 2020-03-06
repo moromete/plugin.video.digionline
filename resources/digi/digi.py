@@ -65,7 +65,7 @@ class Digi():
       # addon_log(response.read())
     
    
-    landedUrl = url = response.geturl()
+    landedUrl = response.geturl()
     # addon_log(landedUrl)
     if(landedUrl == self.siteUrl + '/auth/login'):
       print('Login error')
@@ -137,7 +137,7 @@ class Digi():
       chName = soup.find('h5')
       chName = chName.text
       chName = chName.replace('\\n', '')
-      chName = re.sub('\s+', ' ', chName)
+      chName = re.sub(r'\s+', ' ', chName)
       chName = chName.strip()
       # logo
       logo = soup.find('img', alt="logo", src=True)
@@ -147,7 +147,7 @@ class Digi():
                        'url': chUrl,
                        'logo': logoUrl
                       })
-    return channels;
+    return channels
 
   def getCookie(self, name):
     cookies = requests.utils.dict_from_cookiejar(self.cookieJar)
@@ -196,6 +196,7 @@ class Digi():
       data['quality'] = q
       # print(data)
       # print(q)
+      # print(url);
       jsonStr = self.getPage(url, data, xhr=True)
       if(jsonStr):
         try:    
@@ -208,7 +209,8 @@ class Digi():
     err = None 
     url=None
     if 'stream_url' in chData and chData['stream_url']:
-      url = self.protocol + ':' + chData['stream_url']
+      # url = self.protocol + ':' + chData['stream_url']
+      url = chData['stream_url']
     else:
       if 'data' in  chData and 'content' in chData['data'] and  'stream.manifest.url' in chData['data']['content'] and chData['data']['content']['stream.manifest.url']:
         url = chData['data']['content']['stream.manifest.url']
