@@ -115,7 +115,7 @@ class Digi():
     # print(catLinks)
     cats = []
     for link in catLinks:
-      if(link['href'] != '/') and (link['href'] != '/hbo-go'):
+      if(link['href'] != '/') and (link['href'] != '/hbo-go') and (link['href'] != '/play'):
         cats.append({'name': link['title'],
                      'url': link['href']
                     })
