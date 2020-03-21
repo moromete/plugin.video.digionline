@@ -1,5 +1,6 @@
 v 0.1.1
-  1, fixed html entities in name
+  1. remove html entities from epg
+  2. fix streams urls (stop adding protocol as prefix)
 
 v 0.1.0
   1. fix subscription error messages

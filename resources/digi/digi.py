@@ -67,7 +67,7 @@ class Digi():
       # addon_log(response.read())
     
    
-    landedUrl = url = response.geturl()
+    landedUrl = response.geturl()
     # addon_log(landedUrl)
     if(landedUrl == self.siteUrl + '/auth/login'):
       print('Login error')
@@ -162,7 +162,6 @@ class Digi():
                        'url': chUrl,
                        'logo': logoUrl
                       })
-
     return channels
 
   def getCookie(self, name):
@@ -212,6 +211,7 @@ class Digi():
       data['quality'] = q
       # print(data)
       # print(q)
+      # print(url);
       jsonStr = self.getPage(url, data, xhr=True)
       if(jsonStr):
         try:    
@@ -224,7 +224,8 @@ class Digi():
     err = None 
     url=None
     if 'stream_url' in chData and chData['stream_url']:
-      url = self.protocol + ':' + chData['stream_url']
+      # url = self.protocol + ':' + chData['stream_url']
+      url = chData['stream_url']
     else:
       if 'data' in  chData and 'content' in chData['data'] and  'stream.manifest.url' in chData['data']['content'] and chData['data']['content']['stream.manifest.url']:
         url = chData['data']['content']['stream.manifest.url']
