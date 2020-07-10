@@ -196,7 +196,7 @@ class Digi():
                      'url': last_page['href'].split("=")[0]+'='+str(i),
                      'parent': last_page['href'].split("?")[0]
                     })
-      #xbmc.log('mesaj_sile_pages ' +str(pages), xbmc.LOGNOTICE)
+
     if list_type == 'cats':
       return cats
     elif list_type == 'subcats':
@@ -398,7 +398,6 @@ class Digi():
               subfilename = subname             
            
             subtitles.append({'Url': rooturl + sub, 'SubName': subname, 'SubFileName': subfilename})
-        #xbmc.log('mesaj_sile_link '+ str(subtitles), xbmc.LOGNOTICE)
       else:
         err = chData['error']['error_message']
         soup = BeautifulSoup(err)

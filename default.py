@@ -57,15 +57,13 @@ def listCh(url):
     if cat['url'].startswith(url) and cat['url'] != url:
       addDir(name =  cat['name'].encode('utf8'), url=cat['url'], mode=1)
       isdir=1
-      #xbmc.log('mesaj_sile_cat ' +str(cat), xbmc.LOGNOTICE)
 
   if isdir == 0:  
     submenus = digi.scrapCats('submenus', html, url)
     for cat in submenus:
       if cat['url'].startswith(url) and cat['url'] != url:
         addDir(name =  cat['name'].encode('utf8'), url=cat['url'], mode=1)  
-        isdir=1
-        #xbmc.log('mesaj_sile_submenus ' +str(cat), xbmc.LOGNOTICE)        
+        isdir=1       
 
   if isdir == 0:
     pages = digi.scrapCats('pages', html, url)
@@ -189,7 +187,6 @@ def play(url, name, logo):
                     vtt_to_srt(folder + sub['SubFileName'])
                     subs_paths.append(folder + sub['SubFileName'])
                 listitem.setSubtitles(subs_paths)
-                #xbmc.log('mesaj_sile_link '+ str(folder + sub['SubFileName']), xbmc.LOGNOTICE)
                 addon_log("Local subtitles set")
             else:
                 addon_log("Inject subtitles error: No subtitles for the media")
