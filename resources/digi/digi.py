@@ -1,20 +1,21 @@
 import urllib, urllib2
 import cookielib
 import os
-
 import re
 from bs4 import BeautifulSoup
 import json
 import requests.utils
 from common import *
 
-from common import *
 
 class Digi():
 
   protocol = 'https'
   siteUrl = protocol + '://www.digionline.ro'
-
+  PostsiteUrl = protocol + '://digiapis.rcs-rds.ro/digionline'
+  
+  #UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+  
   headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Encoding': 'identity',
@@ -24,7 +25,17 @@ class Digi():
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0'
   }
-
+  
+  Postheaders = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': '',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Origin': 'https://www.digionline.ro',
+    'Connection': 'keep-alive',
+    'Accept-Encoding': ''
+  }
   cookieFile = 'cookies.txt'
 
   def __init__( self , *args, **kwargs):
@@ -93,7 +104,7 @@ class Digi():
   def getPage(self, url, data=None, xhr=False):
     if (data != None):
       data = urllib.urlencode(data)
-    request = urllib2.Request(self.siteUrl + url, data, self.headers)
+    request = urllib2.Request(url, data, self.headers)
     if(xhr):
       request.add_header('X-Requested-With', 'XMLHttpRequest')
     if (data != None):
@@ -101,67 +112,187 @@ class Digi():
     response = self.opener.open(request)
     return response.read()
 
-  def scrapCats(self, html):
-    if(html == None):
-      return
-    # print(html)
-    # addon_log(html)
-    # f= open("test.html","w+")
-    # f.write(html)
-    # f.close() 
+  def postPage(self, url2, data=None, xhr=False):
+    if (data != None):
+      data = urllib.urlencode(data)
+    request = urllib2.Request(self.PostsiteUrl + url2, data, self.Postheaders)
+    response = self.opener.open(request)
+    return response.read()
+
+  def getManPage(self, url, data=None, xhr=False):
+    if (data != None):
+      data = urllib.urlencode(data)
+    request = urllib2.Request(url, data, self.headers)
+    if(xhr):
+      request.add_header('X-Requested-With', 'XMLHttpRequest')
+    if (data != None):
+      request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+    response = self.opener.open(request)
+    return response.read()
+
+
+  def scrapCats(self, list_type, html, url):
     soup = BeautifulSoup(html, "html.parser")
-    catLinks = soup.find_all('a', class_="nav-menu-item-link", href=True)
-    # addon_log(catLinks)
-    # print(catLinks)
+    categories = soup.findAll("a", {"class": "nav-menu-item-link"})
     cats = []
-    for link in catLinks:
-      if(link['href'] != '/') and (link['href'] != '/hbo-go') and (link['href'] != '/play'):
+    for link in categories:
         cats.append({'name': link['title'],
-                     'url': link['href']
+                     'url': link['href'],
+                     'parent': url
                     })
-        # print(link['href'])
-        # print(link['title'])
-    return cats
-  
+    
+    sub_cats = soup.findAll("a", {"class": "nav-submenu-item-link"})
+    subcats = []
+    for link in sub_cats:
+        subcats.append({'name': link['title'],
+                     'url': link['href'],
+                     'parent': url
+                    })
+    
+    sub_menus = soup.findAll("a", {"class": "nav-submenu-sublist-item-link"})
+    submenus = []
+    wrong_title=''
+    for link in sub_menus:
+      if link['href'] == '/hbo-go/filme/actiune-aventura':
+        wrong_title = 'Actiune, aventura'
+      else:
+        wrong_title = link['title']      
+      submenus.append({'name': wrong_title,##Hbo filme actiune-aventura are titlul gresit Drama
+                    'url': link['href'],
+                   'parent': url
+                    })
+
+    series_ = soup.find("section", {"class": "section-hbogo-subcategory"})
+    series = []
+    if series_:
+      series_2 = soup.findAll("a", {"class": "box-link"}) 
+      for link in series_2:
+        series.append({'name': link['href'].split("/")[-1],
+                       'url': link['href'],
+                     'parent': url.replace('?'+url.split("?")[-1],'')
+                      })
+
+    seasons_ = soup.find("ul", {"class": "seasons-nav-menu"})
+    seasons = []
+    if seasons_:
+      seasons_2 = seasons_.findAll("a", {"href": True}) 
+      for link in seasons_2:
+        seasons.append({'name': link['href'].split("/")[-1],
+                     'url': link['href'],
+                     'parent': url
+                    })
+    
+    pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
+    pages = []
+    if pages_nav:
+      first_page = pages_nav.find("li", {"class": "first-page"}).find("a", {"href": True})
+      last_page = pages_nav.find("li", {"class": "last-page"}).find("a", {"href": True})
+      pages.append({'name': '1',
+         'url': first_page['href'],
+         'parent': first_page['href'].split("?")[0]
+        })
+      for i in range(2,int(last_page['href'].split("=")[-1])+1):
+        pages.append({'name': str(i),
+                     'url': last_page['href'].split("=")[0]+'='+str(i),
+                     'parent': last_page['href'].split("?")[0]
+                    })
+      #xbmc.log('mesaj_sile_pages ' +str(pages), xbmc.LOGNOTICE)
+    if list_type == 'cats':
+      return cats
+    elif list_type == 'subcats':
+      return subcats
+    elif list_type == 'submenus':
+      return submenus
+    elif list_type == 'series':
+      return series
+    elif list_type == 'seasons':
+      return seasons
+    elif list_type == 'pages':
+      return pages
+
   def scrapChannels(self, url):
-    html = self.getPage(url)
+    html = self.getPage(self.siteUrl + url)
     # print(html)
     soup = BeautifulSoup(html, "html.parser")
-    
+    HBOPLAYboxs = soup.find_all(class_="box")
     boxs = soup.find_all(class_="box-content")
     channels = []
-    for box in boxs:
-      #soup = BeautifulSoup(str(box.contents), "html.parser")
-      for cnt in box.contents:
-        cntString = cnt.encode('utf-8')
-        soup = BeautifulSoup(cntString, "html.parser")
+    
+    if('/hbo-go' not in url) and ('/play' not in url):
+      for box in boxs:
+        #soup = BeautifulSoup(str(box.contents), "html.parser")
+        for cnt in box.contents:
+          cntString = cnt.encode('utf-8')
+          soup = BeautifulSoup(cntString, "html.parser")
       
-        # url
-        chLink = soup.find('a', class_="box-link", href=True)
-        if(chLink):
-          chUrl = chLink['href']
+          # url
+          chLink = soup.find('a', class_="box-link", href=True)
+          if(chLink):
+            chUrl = chLink['href']
 
-        # name
-        chNameNode = soup.find('h5')
-        if(chNameNode):
-          chName = chNameNode.string
-          chName = chName.replace('\\n', '')
-          chName = re.sub('\s+', ' ', chName)
-          chName = re.sub('&period', '.', chName)
-          chName = re.sub('&colon', ':', chName)
-          chName = re.sub('&comma', ',', chName)
-          # chName = re.sub('&\w+', ' ', chName)
-          # chName = chName.strip()
+          # name
+          chNameNode = soup.find('h5')
+          if(chNameNode):
+            chName = chNameNode.string
+            chName = chName.replace('\\n', '')
+            chName = re.sub('\s+', ' ', chName)
+            chName = re.sub('&period', '.', chName)
+            chName = re.sub('&colon', ':', chName)
+            chName = re.sub('&comma', ',', chName)
+            # chName = re.sub('&\w+', ' ', chName)
+            #chName = chName.strip()
           
-        # logo
-        logo = soup.find('img', alt="logo", src=True)
-        if(logo):
-          logoUrl = logo['src']
+          # logo
+          logo = soup.find('img', alt="logo", src=True)
+          if(logo):
+            logoUrl = logo['src']
 
-      channels.append({'name': chName,
-                       'url': chUrl,
-                       'logo': logoUrl
-                      })
+        channels.append({'name': chName,
+                         'url': chUrl,
+                         'logo': logoUrl
+                        })
+    
+    for box in HBOPLAYboxs:
+      if('/hbo-go' in url) or ('/play' in url):
+        #soup = BeautifulSoup(str(box.contents), "html.parser")
+        for cnt in box.contents:
+          cntString = cnt.encode('utf-8')
+          soup = BeautifulSoup(cntString, "html.parser")
+      
+          # url
+          chLink = soup.find('a', class_="box-link", href=True)
+          if(chLink):
+            chUrl = chLink['href'].replace("https://www.digionline.ro","")
+
+          # name
+          chNameNode = soup.find('h5')
+          if(chNameNode):
+            chName = chNameNode.string
+            chName = chName.replace('\\n', '')
+            chName = re.sub('\s+', ' ', chName)
+            chName = re.sub('&period', '.', chName)
+            chName = re.sub('&colon', ':', chName)
+            chName = re.sub('&comma', ',', chName)
+          chNameNode = soup.find('h6')
+          if(chNameNode):
+            chName = chNameNode.string
+            chName = chName.replace('\\n', '')
+            chName = re.sub('\s+', ' ', chName)
+            chName = re.sub('&period', '.', chName)
+            chName = re.sub('&colon', ':', chName)
+            chName = re.sub('&comma', ',', chName)
+            
+          # logo
+          logo = soup.find('div', class_='box-background')
+          if(logo):
+            get_style = logo['style']
+            break_url=get_style.split("'")
+            logoUrl=break_url[1]
+
+        channels.append({'name': chName,
+                         'url': chUrl,
+                         'logo': logoUrl
+                        })
     return channels
 
   def getCookie(self, name):
@@ -172,18 +303,19 @@ class Digi():
       return None
 
   def scrapPlayUrl(self, url, quality = None):
-    html = self.getPage(url)
-    # print(html)
+    html = self.getPage(self.siteUrl + url)
     soup = BeautifulSoup(html, "html.parser")
-    player = soup.select("[class*=video-player] > script")
-    # print(player)
+    player = soup.select("[class*=video] > script")
     if(len(player) == 0):
       return
     jsonStr = player[0].text.strip()
-    # print(jsonStr)
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
+    Digi.Postheaders.update({'Referer': self.siteUrl + url})
     chId = chData['new-info']['meta']['streamId']
+    shortcode = chData['shortcode']
+    id_device_full=self.getCookie('deviceId').split(".")
+    id_device=id_device_full[1]
     #detect Quality or try the manualy choosed one
     if(quality != None):
       arrQuality = [quality]
@@ -207,12 +339,29 @@ class Digi():
         'id_stream': chId,
         'quality': None 
       }
+    elif(chData['shortcode'] == 'play'):
+      ip = chData['new-info']['meta']['ip']
+      url2='/api/v12/play_stream_3.php'
+      data = {
+        'id_device': id_device,
+        'asset_id_play': chId,
+        'ip': ip 
+      }
+    elif(chData['shortcode'] == 'hbogo'):
+      ip = chData['new-info']['meta']['ip']
+      url2='/integrationapi/v2/hbogo/hbogo_stream.php'
+      data = {
+        'id_device': id_device,
+        'asset_id_hbo': chId,
+        'ip': ip 
+      }
+   
     for q in arrQuality:
       data['quality'] = q
-      # print(data)
-      # print(q)
-      # print(url);
-      jsonStr = self.getPage(url, data, xhr=True)
+      if(shortcode == 'livestream') or (shortcode == 'nagra-livestream'):
+        jsonStr = self.getPage(self.siteUrl + url, data, xhr=True)
+      elif(shortcode == 'play') or (shortcode == 'hbogo'): 
+        jsonStr = self.postPage(url2, data)
       if(jsonStr):
         try:    
           chData = json.loads(jsonStr)
@@ -223,15 +372,37 @@ class Digi():
 
     err = None 
     url=None
+    subtitles = []
     if 'stream_url' in chData and chData['stream_url']:
-      # url = self.protocol + ':' + chData['stream_url']
       url = chData['stream_url']
     else:
       if 'data' in  chData and 'content' in chData['data'] and  'stream.manifest.url' in chData['data']['content'] and chData['data']['content']['stream.manifest.url']:
         url = chData['data']['content']['stream.manifest.url']
+        rooturl=url.replace(url.split("/")[-1],'')
+        moviename=url.split("/")[-1]
+        movienameroot = moviename.replace(moviename.split(".")[-1],'')
+        subfilename=""
+        jsonStr = self.getPage(url)
+        soup = BeautifulSoup(jsonStr, "html.parser")
+        for el in soup.find_all('baseurl'):
+          sub = ''.join(el.findAll(text=True))
+          if('.vtt' in sub):
+            subname = sub.split("/")[-1]
+            if('ROM' in sub):
+              subfilename = movienameroot +'ro.srt'
+            elif('HUN' in sub):
+              subfilename = movienameroot +'hu.srt'
+            elif('ENG' in sub):
+              subfilename = movienameroot +'en.srt'
+            else:
+              subfilename = subname             
+           
+            subtitles.append({'Url': rooturl + sub, 'SubName': subname, 'SubFileName': subfilename})
+        #xbmc.log('mesaj_sile_link '+ str(subtitles), xbmc.LOGNOTICE)
       else:
         err = chData['error']['error_message']
         soup = BeautifulSoup(err)
         err = soup.get_text()
     return {'url': url,
-            'err': err}
+            'err': err,
+            'subtitles':subtitles}
