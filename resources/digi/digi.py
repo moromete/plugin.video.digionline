@@ -222,7 +222,7 @@ class Digi():
       for box in boxs:
         #soup = BeautifulSoup(str(box.contents), "html.parser")
         for cnt in box.contents:
-          cntString = cnt.encode('utf-8')
+          cntString = cnt.encode('utf-8-sig')
           soup = BeautifulSoup(cntString, "html.parser")
       
           # url
@@ -256,7 +256,7 @@ class Digi():
       if('/hbo-go' in url) or ('/play' in url):
         #soup = BeautifulSoup(str(box.contents), "html.parser")
         for cnt in box.contents:
-          cntString = cnt.encode('utf-8')
+          cntString = cnt.encode('utf-8-sig')
           soup = BeautifulSoup(cntString, "html.parser")
       
           # url

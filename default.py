@@ -205,20 +205,32 @@ def play(url, name, logo):
 #######################################################################################################################
 
 def vtt_to_srt(file):
-  # Read VRT file
+  # Read VTT file
   with open(file) as f:
       lines = f.readlines()
   
   # Find a dot in a string matching e.g. 12:34:56.789
   # and replace it with a comma
+  regex = r"(?<=\d\d:\d\d)\.(?=\d\d\d)"
+  lines = [re.sub(regex, ",", i.rstrip()) for i in lines]
+  
   regex = r"(?<=\d\d:\d\d:\d\d)\.(?=\d\d\d)"
   lines = [re.sub(regex, ",", i.rstrip()) for i in lines]
   
   # Find everything in line after a string matching e.g. 12:34:56,789
   # and delete it
-  regex = r"(?<=\d\d:\d\d:\d\d\,\d\d\d --> \d\d:\d\d:\d\d\,\d\d\d).*"
+  regex = r"(?<=--> \d\d:\d\d\,\d\d\d).*"
   lines = [re.sub(regex, "", i.rstrip()) for i in lines]
   
+  regex = r"(?<=--> \d\d:\d\d:\d\d\,\d\d\d).*"
+  lines = [re.sub(regex, "", i.rstrip()) for i in lines]
+
+  regex = r"(?=^\d\d:\d\d\,\d\d\d)"
+  lines = [re.sub(regex, "00:", i.rstrip()) for i in lines]
+
+  regex = r"(?<=-->)\s(?=\d\d:\d\d\,\d\d\d)"
+  lines = [re.sub(regex, " 00:", i.rstrip()) for i in lines]
+
   # Replace multiple blank lines with a single blank line
   sbl = []
   for i in range(len(lines[:-1])):
