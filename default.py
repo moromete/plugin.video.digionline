@@ -10,10 +10,10 @@ addon = xbmcaddon.Addon(id=addonId)
 logFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
 cookieFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
 
-def addDir(name, url, mode):
+def addDir(name, url, mode,logo=""):
   u = sys.argv[0] + "?url=" + urllib.quote_plus(url) + '&mode=' + str(mode)
   
-  liz = xbmcgui.ListItem(name)
+  liz = xbmcgui.ListItem(name, thumbnailImage=logo)
   liz.setInfo( type="Video", infoLabels={ "Title": name })
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
   return ok
@@ -23,8 +23,9 @@ def addLink(name, url, logo, mode):
                     "&logo=" + urllib.quote_plus(logo) +'&mode=' + str(mode)
 
   liz = xbmcgui.ListItem(name, thumbnailImage=logo)
-  liz.setInfo( type="Video", infoLabels={ "Title": name, "Plot": ''} )
+  liz.setInfo( type="Video", infoLabels={ "Title": name} )
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
+  #xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
   return ok
 
 def listCat():
@@ -40,7 +41,6 @@ def listCat():
     addon_log('Login error')
     xbmcgui.Dialog().ok(addon.getLocalizedString(30015), addon.getLocalizedString(30016))
     return
-
   cats = digi.scrapCats('cats',html,'')
 
   for cat in cats:
@@ -66,8 +66,11 @@ def listCh(url):
         isdir=1       
 
   if isdir == 0:
-    pages = digi.scrapCats('pages', html, url)
-    if pages:
+    pages = digi.scrapPages(html,url)
+    if pages and pages !=None:
+      nextPage=pages[0]['next']
+      lastPageNr=int(pages[0]['last'].split("=")[-1])
+      nextPageNr=int(pages[0]['next'].split("=")[-1])
       series=[]
       for page in pages:
         html=digi.getPage(digi.siteUrl+page['url'])      
@@ -78,26 +81,31 @@ def listCh(url):
           new_series.append(elem)
       series = new_series
       for cat in series: 
-        if cat['parent'] == url and cat['url'] != url and 'seriale' in cat['url']:
-          addDir(name =  cat['name'].encode('utf8'), url=cat['url'], mode=1)  
+        if cat['parent'] == url.split("?")[0] and cat['url'] != url.split("?")[0] and 'seriale' in cat['url']: 
+          addDir(name =  cat['name'], url=cat['url'], mode=1, logo=cat['logo'])
           isdir=1
-   
+      if isdir==1 and lastPageNr>nextPageNr:
+        addDir(name =  'Next Page', url=nextPage, mode=1)
+      
     else:
       series = digi.scrapCats('series', html, url)
       for cat in series:
         if cat['parent'] == url and cat['url'] != url and 'seriale' in cat['url']:
-          addDir(name =  cat['name'].encode('utf8'), url=cat['url'], mode=1)  
+          addDir(name =  cat['name'], url=cat['url'], mode=1, logo=cat['logo'])           
           isdir=1       
 
   if isdir == 0:  
     seasons = digi.scrapCats('seasons', html, url)
     for cat in seasons:
       if cat['parent'] == url and cat['url'] != url and 'sezon' in cat['url'] and 'sezon' not in url:
-        addDir(name =  cat['name'].encode('utf8'), url=cat['url'], mode=1)  
+        addDir(name =  cat['name'].replace("-"," ").capitalize().encode('utf8'), url=cat['url'], mode=1)  
         isdir=1       
   
   if isdir == 0:
-    if pages:
+    if pages and pages !=None:
+      nextPage=pages[0]['next']
+      lastPageNr=int(pages[0]['last'].split("=")[-1])
+      nextPageNr=int(pages[0]['next'].split("=")[-1])
       channels=[]
       for page in pages:
         channels = channels + digi.scrapChannels(page['url'])
@@ -111,6 +119,8 @@ def listCh(url):
                 url =  ch['url'],
                 logo = ch['logo'],
                 mode = 2)
+      if isdir==0 and lastPageNr>nextPageNr:
+        addDir(name =  'Next Page', url=nextPage, mode=1)    
     
     else:
       channels = digi.scrapChannels(url)
@@ -119,7 +129,6 @@ def listCh(url):
               url =  ch['url'],
               logo = ch['logo'],
               mode = 2)
-    
 
 def play(url, name, logo):
   addon_log(url)
@@ -163,7 +172,7 @@ def play(url, name, logo):
         listitem.setProperty('inputstream.adaptive.license_type', DRM)
         listitem.setProperty('inputstream.adaptive.license_key', license_key)
         
-        #  inject subtitles for the EU region, workaround to avoid the sometimes disappearing internal subtitles defined in the manifest
+        #  inject subtitles
         folder = xbmc.translatePath(addon.getAddonInfo('profile'))
         folder = folder + 'subs' + os.sep
         
@@ -201,8 +210,6 @@ def play(url, name, logo):
       listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
       listitem.setInfo('video', {'Title': name})
     xbmc.Player().play(url['url'], listitem)
-
-#######################################################################################################################
 
 def vtt_to_srt(file):
   # Read VTT file
@@ -255,8 +262,6 @@ def vtt_to_srt(file):
   with open(file, "w") as f:
       f.write("\n".join(nel[i:]))
 
-#######################################################################################################################
-#######################################################################################################################
 #read params
 params=getParams()
 try:

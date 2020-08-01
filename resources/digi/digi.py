@@ -130,72 +130,83 @@ class Digi():
     response = self.opener.open(request)
     return response.read()
 
-
   def scrapCats(self, list_type, html, url):
     soup = BeautifulSoup(html, "html.parser")
-    categories = soup.findAll("a", {"class": "nav-menu-item-link"})
-    cats = []
-    for link in categories:
-        cats.append({'name': link['title'],
-                     'url': link['href'],
-                     'parent': url
-                    })
-    
-    sub_cats = soup.findAll("a", {"class": "nav-submenu-item-link"})
-    subcats = []
-    for link in sub_cats:
-        subcats.append({'name': link['title'],
-                     'url': link['href'],
-                     'parent': url
-                    })
-    
-    sub_menus = soup.findAll("a", {"class": "nav-submenu-sublist-item-link"})
-    submenus = []
-    wrong_title=''
-    for link in sub_menus:
-      if link['href'] == '/hbo-go/filme/actiune-aventura':
-        wrong_title = 'Actiune, aventura'
-      else:
-        wrong_title = link['title']      
-      submenus.append({'name': wrong_title,##Hbo filme actiune-aventura are titlul gresit Drama
-                    'url': link['href'],
-                   'parent': url
-                    })
 
-    series_ = soup.find("section", {"class": "section-hbogo-subcategory"})
-    series = []
-    if series_:
-      series_2 = soup.findAll("a", {"class": "box-link"}) 
-      for link in series_2:
-        series.append({'name': link['href'].split("/")[-1],
+    if list_type == 'cats':
+      categories = soup.findAll("a", {"class": "nav-menu-item-link"})
+      cats = []
+      for link in categories:
+          cats.append({'name': link['title'],
                        'url': link['href'],
-                     'parent': url.replace('?'+url.split("?")[-1],'')
+                       'parent': url
                       })
 
-    seasons_ = soup.find("ul", {"class": "seasons-nav-menu"})
-    seasons = []
-    if seasons_:
-      seasons_2 = seasons_.findAll("a", {"href": True}) 
-      for link in seasons_2:
-        seasons.append({'name': link['href'].split("/")[-1],
-                     'url': link['href'],
+    elif list_type == 'subcats':
+      sub_cats = soup.findAll("a", {"class": "nav-submenu-item-link"})
+      subcats = []
+      for link in sub_cats:
+        if 'Kids' in link['title']:
+          subcats.append({'name': link['title'],
+                       'url': link['href']+'/filme',
+                       'parent': url
+                      })
+        else:
+          subcats.append({'name': link['title'],
+                       'url': link['href'],
+                       'parent': url
+                      })          
+
+    elif list_type == 'submenus':
+      sub_menus = soup.findAll("a", {"class": "nav-submenu-sublist-item-link"})
+      submenus = []
+      wrong_title=''
+      for link in sub_menus:
+        if link['href'] == '/hbo-go/filme/actiune-aventura':
+          wrong_title = 'Actiune, aventura'
+        else:
+          wrong_title = link['title']      
+        submenus.append({'name': wrong_title,##Hbo filme actiune-aventura are titlul gresit Drama
+                      'url': link['href'],
                      'parent': url
-                    })
-    
-    pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
-    pages = []
-    if pages_nav:
-      first_page = pages_nav.find("li", {"class": "first-page"}).find("a", {"href": True})
-      last_page = pages_nav.find("li", {"class": "last-page"}).find("a", {"href": True})
-      pages.append({'name': '1',
-         'url': first_page['href'],
-         'parent': first_page['href'].split("?")[0]
-        })
-      for i in range(2,int(last_page['href'].split("=")[-1])+1):
-        pages.append({'name': str(i),
-                     'url': last_page['href'].split("=")[0]+'='+str(i),
-                     'parent': last_page['href'].split("?")[0]
-                    })
+                      })
+
+    elif list_type == 'series':
+      series_ = soup.find_all(class_="box box-portrait box-hbo")
+      series = [] 
+      if series_:
+        for box in series_:
+          for cnt in box.contents:
+            cntString = cnt.encode('utf-8-sig')
+            soup = BeautifulSoup(cntString, "html.parser")
+            Link = soup.find('a', class_="box-link", href=True)
+            if(Link):
+              LinkUrl = Link['href']
+            NameNode = soup.find('h5')
+            if(NameNode):
+              Name = NameNode.string
+            logo = soup.find('div', class_='box-background')
+            if(logo):
+              get_style = logo['style']
+              break_url=get_style.split("'")
+              logoUrl=break_url[1]
+              
+          series.append({'name': Name,
+                             'url': LinkUrl,
+                             'parent': url.replace('?'+url.split("?")[-1],''),
+                           'logo': logoUrl
+                          })
+
+    elif list_type == 'seasons':
+      seasons_ = soup.find("ul", {"class": "seasons-nav-menu"})
+      seasons = []
+      if seasons_:
+        seasons_2 = seasons_.findAll("a", {"href": True}) 
+        for link in seasons_2:
+          seasons.append({'name': link['href'].split("/")[-1],
+                       'url': link['href'],
+                       'parent': url
+                      })
 
     if list_type == 'cats':
       return cats
@@ -207,8 +218,6 @@ class Digi():
       return series
     elif list_type == 'seasons':
       return seasons
-    elif list_type == 'pages':
-      return pages
 
   def scrapChannels(self, url):
     html = self.getPage(self.siteUrl + url)
@@ -220,7 +229,6 @@ class Digi():
     
     if('/hbo-go' not in url) and ('/play' not in url):
       for box in boxs:
-        #soup = BeautifulSoup(str(box.contents), "html.parser")
         for cnt in box.contents:
           cntString = cnt.encode('utf-8-sig')
           soup = BeautifulSoup(cntString, "html.parser")
@@ -239,8 +247,11 @@ class Digi():
             chName = re.sub('&period', '.', chName)
             chName = re.sub('&colon', ':', chName)
             chName = re.sub('&comma', ',', chName)
-            # chName = re.sub('&\w+', ' ', chName)
-            #chName = chName.strip()
+            chName = re.sub('&lpar', '(', chName)
+            chName = re.sub('&rpar', ')', chName)
+            chName = re.sub('&quest', '?', chName)
+            chName = re.sub('&excl', '!', chName)
+            chName = re.sub('&abreve', 'a', chName)
           
           # logo
           logo = soup.find('img', alt="logo", src=True)
@@ -254,7 +265,6 @@ class Digi():
     
     for box in HBOPLAYboxs:
       if('/hbo-go' in url) or ('/play' in url):
-        #soup = BeautifulSoup(str(box.contents), "html.parser")
         for cnt in box.contents:
           cntString = cnt.encode('utf-8-sig')
           soup = BeautifulSoup(cntString, "html.parser")
@@ -273,14 +283,26 @@ class Digi():
             chName = re.sub('&period', '.', chName)
             chName = re.sub('&colon', ':', chName)
             chName = re.sub('&comma', ',', chName)
-          chNameNode = soup.find('h6')
-          if(chNameNode):
-            chName = chNameNode.string
-            chName = chName.replace('\\n', '')
-            chName = re.sub('\s+', ' ', chName)
-            chName = re.sub('&period', '.', chName)
-            chName = re.sub('&colon', ':', chName)
-            chName = re.sub('&comma', ',', chName)
+            chName = re.sub('&lpar', '(', chName)
+            chName = re.sub('&rpar', ')', chName)
+            chName = re.sub('&quest', '?', chName)
+            chName = re.sub('&excl', '!', chName)
+            chName = re.sub('&abreve', 'a', chName)
+            
+          else:
+            chNameNode = soup.find('h6')
+            if(chNameNode):
+              chName = chNameNode.string
+              chName = chName.replace('\\n', '')
+              chName = re.sub('\s+', ' ', chName)
+              chName = re.sub('&period', '.', chName)
+              chName = re.sub('&colon', ':', chName)
+              chName = re.sub('&comma', ',', chName)
+              chName = re.sub('&lpar', '(', chName)
+              chName = re.sub('&rpar', ')', chName)
+              chName = re.sub('&quest', '?', chName)
+              chName = re.sub('&excl', '!', chName)
+              chName = re.sub('&abreve', 'a', chName)
             
           # logo
           logo = soup.find('div', class_='box-background')
@@ -288,7 +310,7 @@ class Digi():
             get_style = logo['style']
             break_url=get_style.split("'")
             logoUrl=break_url[1]
-
+            
         channels.append({'name': chName,
                          'url': chUrl,
                          'logo': logoUrl
@@ -405,3 +427,30 @@ class Digi():
     return {'url': url,
             'err': err,
             'subtitles':subtitles}
+
+  def scrapPages(self, html, url):
+    soup = BeautifulSoup(html, "html.parser")
+    page_offset=addon.getSetting('titles_per_page')
+    if page_offset == 'All':
+      page_offset = "1200"
+    page_offset=int(page_offset)/12
+    pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
+    pages = []
+    if pages_nav:
+      active_page = pages_nav.find("li", {"class": "active"}).find("a", {"href": True})
+      active_page_nr = active_page['href'].split("=")[-1]
+      last_page = pages_nav.find("li", {"class": "last-page"}).find("a", {"href": True})
+      last_page_nr = int(last_page['href'].split("=")[-1])
+      if '=' not in url:
+        url=url +'?p='+'1'
+        url_page_nr = int(url.split("=")[-1])
+      else:
+        url_page_nr = int(url.split("=")[-1])
+      for i in range(url_page_nr,min(last_page_nr+1,url_page_nr+page_offset)):
+        pages.append({'name': str(i),
+                     'url': last_page['href'].split("=")[0]+'='+str(i),
+                     'parent': last_page['href'].split("?")[0],
+                     'next': url.split("=")[0]+'='+str(min(last_page_nr,int(url.split("=")[-1])+ page_offset)),
+                     'last': last_page['href']
+                    })
+    return pages

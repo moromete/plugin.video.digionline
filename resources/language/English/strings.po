@@ -54,3 +54,7 @@ msgstr ""
 msgctxt "#30018"
 msgid "Quality"
 msgstr ""
+
+msgctxt "#30500"
+msgid "No. of titles per page"
+msgstr ""
