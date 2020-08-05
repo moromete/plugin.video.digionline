@@ -185,6 +185,9 @@ def play(url, name, logo):
                 if exc.errno != errno.EEXIST:
                     raise
         try:
+            files = os.listdir(folder)
+            for f in files:
+                os.remove(folder + f)
             subtitles = url['subtitles']
             if len(subtitles) > 0:
                 subs_paths = []
