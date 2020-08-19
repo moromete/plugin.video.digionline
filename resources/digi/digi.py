@@ -239,7 +239,7 @@ class Digi():
             chUrl = chLink['href']
 
           # name
-          chNameNode = soup.find('h5')
+          chNameNode = soup.find('h2')
           if(chNameNode):
             chName = chNameNode.string
             chName = chName.replace('\\n', '')
