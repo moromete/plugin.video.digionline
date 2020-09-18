@@ -213,14 +213,9 @@ def play(url, name, logo):
     else:
       player =  xbmc.Player()
       osAndroid = xbmc.getCondVisibility('system.platform.android')
-      #if(osAndroid):
-      if(True):
+      if(osAndroid):
         from streamplayer import streamplayer
         player = streamplayer(cookieFile=cookieFile)
-
-        # digi = Digi(cookieFile = cookieFile)
-        # m3u = digi.getPage(url['url']) # needed for android devices to be accessed as browser before play otherwise we get 401 error
-        # addon_log(m3u)
       listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
       listitem.setInfo('video', {'Title': name})
     player.play(url['url'], listitem)
