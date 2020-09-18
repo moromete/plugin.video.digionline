@@ -72,6 +72,9 @@ def play(url, name, logo):
     addon_log(url['err'])
     xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
   else:
+    digi = Digi(cookieFile = cookieFile)
+    m3u = digi.getPage(url['url']) # needed for android devices to be accessed as browser before play
+    addon_log(m3u)
     listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
     listitem.setInfo('video', {'Title': name})
     xbmc.Player().play(url['url'], listitem)
