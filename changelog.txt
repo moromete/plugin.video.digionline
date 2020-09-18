@@ -1,3 +1,10 @@
+
+v 0.1.2
+  1. Added Play and HBOGo.
+  2. Added subtitles
+  3. Added pagination option
+  4. Fixed channel name detection
+
 v 0.1.1
   1. remove html entities from epg
   2. fix streams urls (stop adding protocol as prefix)
