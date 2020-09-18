@@ -339,16 +339,16 @@ class Digi():
     id_device_full=self.getCookie('deviceId').split(".")
     id_device=id_device_full[1]
     #detect Quality or try the manualy choosed one
-    if(quality != None):
-      arrQuality = [quality]
-    else: 
-      abr = False
-      if hasattr(chData['new-info']['meta'], 'abr'):
-        abr = chData['new-info']['meta']['abr']
-      if(abr):
-        arrQuality = ['abr', 'hq', 'mq', 'lq']
-      else:
-        arrQuality = ['hq', 'mq', 'lq']
+    # if(quality != None):
+    #   arrQuality = [quality]
+    # else: 
+    #   abr = False
+    #   if hasattr(chData['new-info']['meta'], 'abr'):
+    #     abr = chData['new-info']['meta']['abr']
+    #   if(abr):
+    #     arrQuality = ['abr', 'hq', 'mq', 'lq']
+    #   else:
+    #     arrQuality = ['hq', 'mq', 'lq']
 
     if(chData['shortcode'] == 'livestream'):
       data = {
@@ -378,19 +378,20 @@ class Digi():
         'ip': ip 
       }
    
-    for q in arrQuality:
-      data['quality'] = q
-      if(shortcode == 'livestream') or (shortcode == 'nagra-livestream'):
-        jsonStr = self.getPage(self.siteUrl + url, data, xhr=True)
-      elif(shortcode == 'play') or (shortcode == 'hbogo'): 
-        jsonStr = self.postPage(url2, data)
-      if(jsonStr):
-        try:    
-          chData = json.loads(jsonStr)
-          if(chData['stream_url']):
-            break
-        except:
-          pass
+    #for q in arrQuality:
+    # data['quality'] = q
+    data['quality'] = 'abr'
+    if(shortcode == 'livestream') or (shortcode == 'nagra-livestream'):
+      jsonStr = self.getPage(self.siteUrl + url, data, xhr=True)
+    elif(shortcode == 'play') or (shortcode == 'hbogo'): 
+      jsonStr = self.postPage(url2, data)
+    if(jsonStr):
+      # try:    
+      chData = json.loads(jsonStr)
+        # if(chData['stream_url']):
+          # break
+      # except:
+      #   pass
 
     err = None 
     url=None

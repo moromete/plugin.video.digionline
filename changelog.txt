@@ -1,4 +1,8 @@
 
+v 0.1.3
+  1. Fix play on android os
+  2. remove quality selection since is no longer needed. kodi can select program bitrate from the m3u8 file
+
 v 0.1.2
   1. Added Play and HBOGo.
   2. Added subtitles

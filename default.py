@@ -133,16 +133,17 @@ def listCh(url):
 def play(url, name, logo):
   addon_log(url)
 
-  quality = None
-  arrQualities = ['abr', 'hq', 'mq', 'lq']
-  if(addon.getSetting('choose_quality') == 'true'):
-    dialog = xbmcgui.Dialog()
-    quality = dialog.select(addon.getLocalizedString(30018), arrQualities)
-    quality = arrQualities[quality]
-    # addon_log(quality)
+  # quality = None
+  # arrQualities = ['abr', 'hq', 'mq', 'lq']
+  # if(addon.getSetting('choose_quality') == 'true'):
+  #   dialog = xbmcgui.Dialog()
+  #   quality = dialog.select(addon.getLocalizedString(30018), arrQualities)
+  #   quality = arrQualities[quality]
+  #   # addon_log(quality)
 
   digi = Digi(cookieFile = cookieFile)
-  url = digi.scrapPlayUrl(url, quality)
+  #url = digi.scrapPlayUrl(url, quality)
+  url = digi.scrapPlayUrl(url)
   if(url['err'] != None):
     addon_log(url['err'])
     xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])

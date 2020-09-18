@@ -8,7 +8,7 @@
     <setting id="password" type="text" label="30012" default="" option="hidden"/>
     <setting id="reset_login" type="bool" label="30014" default="false"/>
     <setting type="sep" />
-    <setting id="choose_quality" type="bool" label="30017" default="false"/>
+    <!-- <setting id="choose_quality" type="bool" label="30017" default="false"/> -->
 	<setting id="titles_per_page" type="select" label="30500" values="All|12|24|48|60" default="All" />
 
   </category>
