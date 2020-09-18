@@ -211,14 +211,19 @@ def play(url, name, logo):
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
         
     else:
+      player =  xbmc.Player()
       osAndroid = xbmc.getCondVisibility('system.platform.android')
-      if(osAndroid):
-        digi = Digi(cookieFile = cookieFile)
-        m3u = digi.getPage(url['url']) # needed for android devices to be accessed as browser before play otherwise we get 401 error
-        addon_log(m3u)
+      #if(osAndroid):
+      if(True):
+        from streamplayer import streamplayer
+        player = streamplayer(cookieFile=cookieFile)
+
+        # digi = Digi(cookieFile = cookieFile)
+        # m3u = digi.getPage(url['url']) # needed for android devices to be accessed as browser before play otherwise we get 401 error
+        # addon_log(m3u)
       listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
       listitem.setInfo('video', {'Title': name})
-    xbmc.Player().play(url['url'], listitem)
+    player.play(url['url'], listitem)
 
 def vtt_to_srt(file):
   # Read VTT file
