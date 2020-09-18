@@ -10,6 +10,7 @@ class streamplayer(xbmc.Player):
 
   def play(self, url, listitem):
     self.player_status = 'play'
+    self.digiFakeRequest(url)
     super(streamplayer, self).play(url, listitem)
     self.keep_allive(url)
 
@@ -22,15 +23,18 @@ class streamplayer(xbmc.Player):
     self.player_status = 'stop'
 
   def keep_allive(self, url):
-    xbmc.sleep(500)
-
     #KEEP SCRIPT ALLIVE
+    time = 0 
+    interval = 500
     while (self.player_status=='play'):
       addon_log('ALLIVE')
-      
-      digi = Digi(cookieFile = self.cookieFile)
-      m3u = digi.getPage(url) # needed for android devices to be accessed as browser before play otherwise we get 401 error
-      addon_log(m3u)
-
-      xbmc.sleep(60 * 1000)
-      
+      xbmc.sleep(500)
+      time += interval
+      if(time > 60 * 1000):
+        time = 0
+        self.digiFakeRequest(url)
+  
+  def digiFakeRequest(self, url):
+    digi = Digi(cookieFile = self.cookieFile)
+    m3u = digi.getPage(url) # needed for android devices to be accessed as browser before play otherwise we get 401 error
+    addon_log(m3u)
