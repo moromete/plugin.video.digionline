@@ -32,6 +32,6 @@ def getParams():
 
 def addon_log(string):
   if addon and addon.getSetting('debug') == 'true':
-    if isinstance(string, unicode):
-      string = string.encode('utf-8')
+    # if isinstance(string, unicode):
+    #   string = string.encode('utf-8')
     xbmc.log("[%s-%s]: %s" %(addonId, addon.getAddonInfo('version'), string))

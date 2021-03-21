@@ -1,5 +1,7 @@
-import urllib, urllib2
-import cookielib
+import urllib
+# , urllib2
+import http.cookiejar
+# import cookielib
 import os
 import re
 from bs4 import BeautifulSoup
@@ -41,37 +43,39 @@ class Digi():
   def __init__( self , *args, **kwargs):
     if(kwargs.get('cookieFile')):
       self.cookieFile=kwargs.get('cookieFile')
-    self.cookieJar = cookielib.LWPCookieJar(filename=self.cookieFile)
+    self.cookieJar = http.cookiejar.MozillaCookieJar(filename = self.cookieFile)
     try:
       self.cookieJar.load(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
     except:
       pass
-    self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookieJar))
+    self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
 
   def login( self, username, password):
     if(self.getCookie('deviceId') != None):
-      request = urllib2.Request(self.siteUrl, None, self.headers)
+      request = urllib.request.Request(self.siteUrl, None, self.headers)
       response = self.opener.open(request)
       # addon_log(self.siteUrl)
       # addon_log(response)
       # print(response.read())
     else:
-      request = urllib2.Request(self.siteUrl + '/auth/login', None, self.headers)
+      request = urllib.request.Request(self.siteUrl + '/auth/login', None, self.headers)
       response = self.opener.open(request)
       self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
 
-      logindata = urllib.urlencode({
+      logindata = urllib.parse.urlencode({
         'form-login-email': username,
         'form-login-password': password,
       })
-      request = urllib2.Request(self.siteUrl + '/auth/login', logindata, self.headers)
+      logindata = logindata.encode('ascii')
+      request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
       response = self.opener.open(request)
       self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
       
-      logindata = urllib.urlencode({
+      logindata = urllib.parse.urlencode({
         'form-login-mode': 'mode-all'
       })
-      request = urllib2.Request(self.siteUrl + '/auth/login', logindata, self.headers)
+      logindata = logindata.encode('ascii')
+      request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
       response = self.opener.open(request)
       self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
       # print(response.read())
@@ -92,8 +96,8 @@ class Digi():
     if(loginLink != None):
       addon_log('Login error retry by reset login')
       os.remove(self.cookieFile)
-      self.cookieJar = cookielib.LWPCookieJar(filename=self.cookieFile)
-      self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookieJar))
+      self.cookieJar = http.cookiejar.MozillaCookieJar(self.cookieFile)
+      self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
       return self.login(username, password)
 
     # print(response.info())
@@ -103,8 +107,9 @@ class Digi():
 
   def getPage(self, url, data=None, xhr=False):
     if (data != None):
-      data = urllib.urlencode(data)
-    request = urllib2.Request(url, data, self.headers)
+      data = urllib.parse.urlencode(data)
+      data = data.encode('ascii')
+    request = urllib.request.Request(url, data, self.headers)
     if(xhr):
       request.add_header('X-Requested-With', 'XMLHttpRequest')
     if (data != None):
@@ -114,15 +119,17 @@ class Digi():
 
   def postPage(self, url2, data=None, xhr=False):
     if (data != None):
-      data = urllib.urlencode(data)
-    request = urllib2.Request(self.PostsiteUrl + url2, data, self.Postheaders)
+      data = urllib.parse.urlencode(data)
+      data = data.encode('ascii')
+    request = urllib.request.Request(self.PostsiteUrl + url2, data, self.Postheaders)
     response = self.opener.open(request)
     return response.read()
 
   def getManPage(self, url, data=None, xhr=False):
     if (data != None):
-      data = urllib.urlencode(data)
-    request = urllib2.Request(url, data, self.headers)
+      data = urllib.parse.urlencode(data)
+      data = data.encode('ascii')
+    request = urllib.request.Request(url, data, self.headers)
     if(xhr):
       request.add_header('X-Requested-With', 'XMLHttpRequest')
     if (data != None):
@@ -326,11 +333,12 @@ class Digi():
 
   def scrapPlayUrl(self, url, quality = None):
     html = self.getPage(self.siteUrl + url)
+    # addon_log(html)
     soup = BeautifulSoup(html, "html.parser")
     player = soup.select("[class*=video] > script")
     if(len(player) == 0):
       return
-    jsonStr = player[0].text.strip()
+    jsonStr = player[0].string.strip()
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
     Digi.Postheaders.update({'Referer': self.siteUrl + url})

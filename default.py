@@ -10,19 +10,19 @@ addon = xbmcaddon.Addon(id=addonId)
 logFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
 cookieFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
 
-def addDir(name, url, mode,logo=""):
-  u = sys.argv[0] + "?url=" + urllib.quote_plus(url) + '&mode=' + str(mode)
+def addDir(name, url, mode):
+  u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + '&mode=' + str(mode)
   
-  liz = xbmcgui.ListItem(name, thumbnailImage=logo)
+  liz = xbmcgui.ListItem(name)
   liz.setInfo( type="Video", infoLabels={ "Title": name })
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
   return ok
 
 def addLink(name, url, logo, mode):
-  u = sys.argv[0] + "?url=" + urllib.quote_plus(url) + "&name=" + urllib.quote_plus(name) + \
-                    "&logo=" + urllib.quote_plus(logo) +'&mode=' + str(mode)
+  u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + "&name=" + urllib.parse.quote_plus(name) + \
+                    "&logo=" + urllib.parse.quote_plus(logo) +'&mode=' + str(mode)
 
-  liz = xbmcgui.ListItem(name, thumbnailImage=logo)
+  liz = xbmcgui.ListItem(name)
   liz.setInfo( type="Video", infoLabels={ "Title": name} )
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
   #xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
@@ -216,7 +216,7 @@ def play(url, name, logo):
       if(osAndroid):
         from streamplayer import streamplayer
         player = streamplayer(cookieFile=cookieFile)
-      listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
+      listitem = xbmcgui.ListItem(name)
       listitem.setInfo('video', {'Title': name})
     player.play(url['url'], listitem)
 
@@ -278,15 +278,15 @@ try:
 except:
   mode=None
 try:
-  url=urllib.unquote_plus(params["url"])
+  url=urllib.parse.unquote_plus(params["url"])
 except:
   url=None
 try:
-  name=urllib.unquote_plus(params["name"])
+  name=urllib.parse.unquote_plus(params["name"])
 except:
   name=None
 try:
-  logo=urllib.unquote_plus(params["logo"])
+  logo=urllib.parse.unquote_plus(params["logo"])
 except:
   logo=None
 
