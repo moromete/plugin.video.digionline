@@ -1,4 +1,4 @@
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 import os, urllib, re
 import traceback
 import requests
@@ -7,22 +7,25 @@ from resources.digi.digi import Digi
 
 addonId = 'plugin.video.digionline'
 addon = xbmcaddon.Addon(id=addonId)
-logFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
-cookieFile = os.path.join(xbmc.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
+logFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
+cookieFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
 
-def addDir(name, url, mode):
+def addDir(name, url, mode, logo = None):
   u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + '&mode=' + str(mode)
   
   liz = xbmcgui.ListItem(name)
+  if logo:
+    liz.setArt({'thumb': logo})
   liz.setInfo( type="Video", infoLabels={ "Title": name })
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
   return ok
 
-def addLink(name, url, logo, mode):
+def addLink(name, url, mode, logo):
   u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + "&name=" + urllib.parse.quote_plus(name) + \
                     "&logo=" + urllib.parse.quote_plus(logo) +'&mode=' + str(mode)
 
   liz = xbmcgui.ListItem(name)
+  liz.setArt({'thumb': logo})
   liz.setInfo( type="Video", infoLabels={ "Title": name} )
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
   #xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)

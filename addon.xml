@@ -22,5 +22,9 @@
       - Watch Tv based on your DigiOnline account.
     </description>
     <platform>all</platform>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
   </extension>
 </addon>
