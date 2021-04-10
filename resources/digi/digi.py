@@ -8,10 +8,9 @@ from bs4 import BeautifulSoup
 import json
 import requests.utils
 from common import *
-
+import requests
 
 class Digi():
-
   protocol = 'https'
   siteUrl = protocol + '://www.digionline.ro'
   PostsiteUrl = protocol + '://digiapis.rcs-rds.ro/digionline'
@@ -23,121 +22,124 @@ class Digi():
     'Accept-Encoding': 'identity',
     'Accept-Language': 'en-US,en;q=0.5', 
     'Connection': 'keep-alive',
-    'Host': 'www.digionline.ro',
+    # 'Host': 'www.digionline.ro',
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0'
   }
   
-  Postheaders = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': '',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'Origin': 'https://www.digionline.ro',
-    'Connection': 'keep-alive',
-    'Accept-Encoding': ''
-  }
-  cookieFile = 'cookies.txt'
-
+  # Postheaders = {
+  #   'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
+  #   'Accept': 'application/json, text/javascript, */*; q=0.01',
+  #   'Accept-Language': 'en-US,en;q=0.9',
+  #   'Referer': '',
+  #   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+  #   'Origin': 'https://www.digionline.ro',
+  #   'Connection': 'keep-alive',
+  #   'Accept-Encoding': ''
+  # }
+  # cookieFile = 'cookies.txt'
+  
   def __init__( self , *args, **kwargs):
-    if(kwargs.get('cookieFile')):
-      self.cookieFile=kwargs.get('cookieFile')
-    self.cookieJar = http.cookiejar.MozillaCookieJar(filename = self.cookieFile)
-    try:
-      self.cookieJar.load(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
-    except:
-      pass
-    self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
+    if(kwargs.get('deviceId')):
+      self.deviceId=kwargs.get('deviceId')
+    if(kwargs.get('DOSESSV3PRI')):      
+      self.DOSESSV3PRI=kwargs.get('DOSESSV3PRI')
 
-  def login( self, username, password):
-    if(self.getCookie('deviceId') != None):
-      request = urllib.request.Request(self.siteUrl, None, self.headers)
-      response = self.opener.open(request)
-      # addon_log(self.siteUrl)
-      # addon_log(response)
-      # print(response.read())
-    else:
-      request = urllib.request.Request(self.siteUrl + '/auth/login', None, self.headers)
-      response = self.opener.open(request)
-      self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+    self.cookies = {'deviceId': self.deviceId,
+                    'DOSESSV3PRI' : self.DOSESSV3PRI}
 
-      logindata = urllib.parse.urlencode({
-        'form-login-email': username,
-        'form-login-password': password,
-      })
-      logindata = logindata.encode('ascii')
-      request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
-      response = self.opener.open(request)
-      self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+    # if(kwargs.get('cookieFile')):
+    #   self.cookieFile=kwargs.get('cookieFile')
+    # self.cookieJar = http.cookiejar.MozillaCookieJar(filename = self.cookieFile)
+    # try:
+    #   self.cookieJar.load(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+    # except:
+    #   pass
+    # self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
+
+  # def login( self, username, password):
+  #   if(self.getCookie('deviceId') != None):
+  #     request = urllib.request.Request(self.siteUrl, None, self.headers)
+  #     response = self.opener.open(request)
+  #     # addon_log(self.siteUrl)
+  #     # addon_log(response)
+  #     # print(response.read())
+  #   else:
+  #     request = urllib.request.Request(self.siteUrl + '/auth/login', None, self.headers)
+  #     response = self.opener.open(request)
+  #     self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+
+  #     logindata = urllib.parse.urlencode({
+  #       'form-login-email': username,
+  #       'form-login-password': password,
+  #       # g-recaptcha-response: 03AGdBq27SsPKUagbHemILuX6REsJ59GEZv6x-Ad8kIzBCD-34saW7Sc0uPlGurt5tDWhIGGPH7BMTioOcuBjeJi-0q0UhmaOD2bPSge-gL1puBpV80c2Qy-Hy76oro03jlwYTSJnj50j_ZAN4DZ1XgBaZLdhErs6WCglyFEkR3LC6Yz_MOqm3uJ040emoamZYPjhHRXKyNfVfG6N5edN8WNFnFQN5Zn6xmLL8Qw7P53040byzfS8OaWZg_3grPc_OSeYNb_wG4VlnbZ2aDwaZLUwGR5SPAqf6p6Ad7dz0kWXgxzDbmktPzlpLOcav2cLbwKyLRGuBvzYd7bFGJqN2ZeEgPo6hHu7Ge6n80se_1WoMrOJevjv3opNc2lz42Pt4M_ieE0cSiTAALukewYgZzcT8hp2Zw9JjGvcYHvrNTFdE4rfOVQUzK_pVg2qRK2B3WLnzF_S2EfX5
+  #     })
+  #     logindata = logindata.encode('ascii')
+  #     # request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
+  #     request = urllib.request.Request(self.siteUrl + '/auth/login-digiro', None, self.headers)
+  #     response = self.opener.open(request)
+  #     print(response.read())
+  #     self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
       
-      logindata = urllib.parse.urlencode({
-        'form-login-mode': 'mode-all'
-      })
-      logindata = logindata.encode('ascii')
-      request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
-      response = self.opener.open(request)
-      self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
-      # print(response.read())
-      # addon_log(response.read())
+  #     logindata = urllib.parse.urlencode({
+  #       'form-login-mode': 'mode-all'
+  #     })
+  #     logindata = logindata.encode('ascii')
+  #     request = urllib.request.Request(self.siteUrl + '/auth/login', logindata, self.headers)
+  #     response = self.opener.open(request)
+  #     self.cookieJar.save(filename=self.cookieFile, ignore_discard=True, ignore_expires=True)
+  #     #print(response.read())
+  #     # addon_log(response.read())
     
    
-    landedUrl = response.geturl()
-    # addon_log(landedUrl)
-    if(landedUrl == self.siteUrl + '/auth/login'):
-      print('Login error')
-      return
+  #   landedUrl = response.geturl()
+  #   # addon_log(landedUrl)
+  #   if(landedUrl == self.siteUrl + '/auth/login'):
+  #     print('Login error')
+  #     return
 
-    #retry login if we get a response page with Login link in it
-    html = response.read()
-    soup = BeautifulSoup(html, "html.parser")
-    loginLink = soup.find('a', class_="header-account-login", href=True)
-    # addon_log(loginLink)
-    if(loginLink != None):
-      addon_log('Login error retry by reset login')
-      os.remove(self.cookieFile)
-      self.cookieJar = http.cookiejar.MozillaCookieJar(self.cookieFile)
-      self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
-      return self.login(username, password)
+  #   #retry login if we get a response page with Login link in it
+  #   html = response.read()
+  #   soup = BeautifulSoup(html, "html.parser")
+  #   loginLink = soup.find('a', class_="header-account-login", href=True)
+  #   # addon_log(loginLink)
+  #   if(loginLink != None):
+  #     addon_log('Login error retry by reset login')
+  #     os.remove(self.cookieFile)
+  #     self.cookieJar = http.cookiejar.MozillaCookieJar(self.cookieFile)
+  #     self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookieJar))
+  #     return self.login(username, password)
 
-    # print(response.info())
-    # print(response.geturl())
-    # print(response.getcode())
-    return html
+  #   # print(response.info())
+  #   # print(response.geturl())
+  #   # print(response.getcode())
+  #   return html
 
-  def getPage(self, url, data=None, xhr=False):
+  def getPage(self, url, data=None, xhr=False, json=False):
     if (data != None):
-      data = urllib.parse.urlencode(data)
-      data = data.encode('ascii')
-    request = urllib.request.Request(url, data, self.headers)
-    if(xhr):
-      request.add_header('X-Requested-With', 'XMLHttpRequest')
-    if (data != None):
-      request.add_header('Content-Type', 'application/x-www-form-urlencoded')
-    response = self.opener.open(request)
-    return response.read()
+      # data = urllib.parse.urlencode(data)
+      # data = data.encode('ascii')
+      if(xhr):
+        self.headers['X-Requested-With'] = 'XMLHttpRequest'
+      else:
+        self.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      addon_log(self.headers)
+      response = requests.post(url, cookies=self.cookies, headers=self.headers, data = data)
+    else:
+      response = requests.get(url, cookies=self.cookies, headers=self.headers)
+    if(json):
+      return response.json()
+    else:
+      return response.text
+    # request = urllib.request.Request(url, data, self.headers)
+    # if(xhr):
+    #   request.add_header('X-Requested-With', 'XMLHttpRequest')
+    # if (data != None):
+    #   request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+    # response = self.opener.open(request)
+    # return response.read()
 
-  def postPage(self, url2, data=None, xhr=False):
-    if (data != None):
-      data = urllib.parse.urlencode(data)
-      data = data.encode('ascii')
-    request = urllib.request.Request(self.PostsiteUrl + url2, data, self.Postheaders)
-    response = self.opener.open(request)
-    return response.read()
-
-  def getManPage(self, url, data=None, xhr=False):
-    if (data != None):
-      data = urllib.parse.urlencode(data)
-      data = data.encode('ascii')
-    request = urllib.request.Request(url, data, self.headers)
-    if(xhr):
-      request.add_header('X-Requested-With', 'XMLHttpRequest')
-    if (data != None):
-      request.add_header('Content-Type', 'application/x-www-form-urlencoded')
-    response = self.opener.open(request)
-    return response.read()
-
-  def scrapCats(self, list_type, html, url):
+  def scrapCats(self, list_type, html, url=None):
     soup = BeautifulSoup(html, "html.parser")
 
     if list_type == 'cats':
@@ -325,7 +327,8 @@ class Digi():
     return channels
 
   def getCookie(self, name):
-    cookies = requests.utils.dict_from_cookiejar(self.cookieJar)
+    # cookies = requests.utils.dict_from_cookiejar(self.cookieJar)
+    cookies = self.cookies
     try:
       return cookies[name]
     except:
@@ -333,6 +336,7 @@ class Digi():
 
   def scrapPlayUrl(self, url, quality = None):
     html = self.getPage(self.siteUrl + url)
+    #print(html)
     # addon_log(html)
     soup = BeautifulSoup(html, "html.parser")
     player = soup.select("[class*=video] > script")
@@ -341,11 +345,11 @@ class Digi():
     jsonStr = player[0].string.strip()
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
-    Digi.Postheaders.update({'Referer': self.siteUrl + url})
     chId = chData['new-info']['meta']['streamId']
     shortcode = chData['shortcode']
     id_device_full=self.getCookie('deviceId').split(".")
     id_device=id_device_full[1]
+
     #detect Quality or try the manualy choosed one
     # if(quality != None):
     #   arrQuality = [quality]
@@ -390,17 +394,11 @@ class Digi():
     # data['quality'] = q
     data['quality'] = 'abr'
     if(shortcode == 'livestream') or (shortcode == 'nagra-livestream'):
-      jsonStr = self.getPage(self.siteUrl + url, data, xhr=True)
+      chData = self.getPage(self.siteUrl + url, data=data, xhr=True, json=True)
     elif(shortcode == 'play') or (shortcode == 'hbogo'): 
-      jsonStr = self.postPage(url2, data)
-    if(jsonStr):
-      # try:    
-      chData = json.loads(jsonStr)
-        # if(chData['stream_url']):
-          # break
-      # except:
-      #   pass
-
+      self.headers.update({'Referer': self.siteUrl + url})
+      chData = self.getPage(self.PostsiteUrl + url2, data=data, json=True)
+      
     err = None 
     url=None
     subtitles = []
@@ -463,3 +461,4 @@ class Digi():
                      'last': last_page['href']
                     })
     return pages
+  

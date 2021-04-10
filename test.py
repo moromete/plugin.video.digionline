@@ -2,11 +2,13 @@ import sys
 
 from resources.digi.digi import Digi
 
-digi = Digi()
-html = digi.login(sys.argv[1], sys.argv[2])
+digi = Digi(deviceId = 'xxxxxx', DOSESSV3PRI = 'yyyyyyyy')
+# html = digi.login(sys.argv[1], sys.argv[2])
+html = digi.getPage(digi.siteUrl)
+# print(html)
 
-# cats = digi.scrapCats(html)
-# print(cats)
+#cats = digi.scrapCats('cats', html)
+#print(cats)
 #channels = digi.scrapChannels('/filme')
 #print(channels)
 # print(channels[0])

@@ -8,7 +8,7 @@ from resources.digi.digi import Digi
 addonId = 'plugin.video.digionline'
 addon = xbmcaddon.Addon(id=addonId)
 logFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
-cookieFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
+# cookieFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
 
 def addDir(name, url, mode, logo = None):
   u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + '&mode=' + str(mode)
@@ -32,18 +32,23 @@ def addLink(name, url, mode, logo):
   return ok
 
 def listCat():
-  if(addon.getSetting('reset_login') == 'true'):
-    os.remove(cookieFile)
-    addon.setSetting(id='reset_login', value='false')
+  # if(addon.getSetting('reset_login') == 'true'):
+  #   os.remove(cookieFile)
+  #   addon.setSetting(id='reset_login', value='false')
 
-  digi = Digi(cookieFile = cookieFile)
-  html = digi.login(addon.getSetting('username'), addon.getSetting('password'))
+  # digi = Digi(cookieFile = cookieFile)
+  # html = digi.login(addon.getSetting('username'), addon.getSetting('password'))\
+  if(not addon.getSetting('deviceId') or not addon.getSetting('DOSESSV3PRI') ):
+    xbmcgui.Dialog().ok(addon.getLocalizedString(30013), addon.getLocalizedString(30014))
+    return
+  digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
+  html=digi.getPage(digi.siteUrl)
 
   #addon_log(html)
-  if(html == None):
-    addon_log('Login error')
-    xbmcgui.Dialog().ok(addon.getLocalizedString(30015), addon.getLocalizedString(30016))
-    return
+  # if(html == None):
+  #   addon_log('Login error')
+  #   xbmcgui.Dialog().ok(addon.getLocalizedString(30015), addon.getLocalizedString(30016))
+  #   return
   cats = digi.scrapCats('cats',html,'')
 
   for cat in cats:
@@ -51,7 +56,7 @@ def listCat():
 
 def listCh(url):
   addon_log(url)
-  digi = Digi(cookieFile = cookieFile)
+  digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
   html=digi.getPage(digi.siteUrl+url)
   isdir=0
 
@@ -144,7 +149,7 @@ def play(url, name, logo):
   #   quality = arrQualities[quality]
   #   # addon_log(quality)
 
-  digi = Digi(cookieFile = cookieFile)
+  digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
   #url = digi.scrapPlayUrl(url, quality)
   url = digi.scrapPlayUrl(url)
   if(url['err'] != None):
@@ -218,7 +223,7 @@ def play(url, name, logo):
       osAndroid = xbmc.getCondVisibility('system.platform.android')
       if(osAndroid):
         from streamplayer import streamplayer
-        player = streamplayer(cookieFile=cookieFile)
+        player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
       listitem = xbmcgui.ListItem(name)
       listitem.setInfo('video', {'Title': name})
     player.play(url['url'], listitem)

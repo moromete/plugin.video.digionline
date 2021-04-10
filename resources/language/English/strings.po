@@ -24,11 +24,11 @@ msgid "Enable Add-on Debugging"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Username"
+msgid "deviceId"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Password"
+msgid "DOSESSV3PRI"
 msgstr ""
 
 msgctxt "#30013"
@@ -36,7 +36,7 @@ msgid "Error"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Reset login (in case you changed login credetials or you want to register as new device)"
+msgid "Setup your cookies data from addon settings to be able to login"
 msgstr ""
 
 msgctxt "#30015"
@@ -48,7 +48,7 @@ msgid "Please verify your user name and password or check if you do not have to 
 msgstr ""
 
 msgctxt "#30017"
-msgid "Choose quality before play"
+msgid "Cookies extracted from browser after normal login"
 msgstr ""
 
 msgctxt "#30018"

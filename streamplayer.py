@@ -4,7 +4,10 @@ from resources.digi.digi import Digi
 
 class streamplayer(xbmc.Player):
   def __init__(self, *args, **kwargs):
-    self.cookieFile = kwargs.get('cookieFile')
+    # self.cookieFile = kwargs.get('cookieFile')
+    self.deviceId = kwargs.get('deviceId')
+    self.DOSESSV3PRI = kwargs.get('DOSESSV3PRI')
+
     self.player_status = None
     xbmc.Player.__init__(self)
 
@@ -35,6 +38,6 @@ class streamplayer(xbmc.Player):
         self.digiFakeRequest(url)
   
   def digiFakeRequest(self, url):
-    digi = Digi(cookieFile = self.cookieFile)
+    digi = Digi(deviceId=self.deviceId, DOSESSV3PRI=self.DOSESSV3PRI)
     m3u = digi.getPage(url) # needed for android devices to be accessed as browser before play otherwise we get 401 error
     addon_log(m3u)
