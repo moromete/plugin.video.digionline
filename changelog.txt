@@ -1,4 +1,7 @@
 
+v 0.2.2
+  1. add setup action to be able to setup from json rpc
+
 v 0.2.1
   1. removed username / password login method from settings and replaced them with cookies that need to be extracted from browser after a successful
      login to www.digionline.ro (needed because digi introduced recaptcha limitation to login so normal login method can not be used anymore)

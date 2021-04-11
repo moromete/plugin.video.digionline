@@ -307,4 +307,18 @@ elif (mode==2):  #play stream
     xbmc.Player().stop()
   play(url = url, name = name, logo=logo)
 
+try:
+  deviceId = params["deviceId"]
+except:
+  deviceId = None
+try:
+  DOSESSV3PRI = params["DOSESSV3PRI"]
+except:
+  DOSESSV3PRI = None
+if(deviceId and DOSESSV3PRI) :
+  addon.setSetting('deviceId', deviceId)
+  addon.setSetting('DOSESSV3PRI', DOSESSV3PRI)
+  xbmc.executebuiltin("Notification(%s,%s,%i)" % (addon.getLocalizedString(30020), "", 5000))
+  listCat()
+
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
