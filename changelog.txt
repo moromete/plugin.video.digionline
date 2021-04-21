@@ -1,4 +1,7 @@
 
+v 0.3.0
+  1. add api support to enable user an password login
+
 v 0.2.2
   1. add setup action to be able to setup from json rpc
 
