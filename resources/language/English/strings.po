@@ -47,16 +47,24 @@ msgctxt "#30016"
 msgid "Please verify your user name and password or check if you do not have to many devices registered on your account or your login data needs reset from addon setting!"
 msgstr ""
 
-msgctxt "#30017"
-msgid "Cookies extracted from browser after normal login"
-msgstr ""
-
 msgctxt "#30018"
 msgid "Quality"
 msgstr ""
 
 msgctxt "#30020"
 msgid "Addon cookies setup successfully !"
+msgstr ""
+
+msgctxt "#30021"
+msgid "API / Scraping"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Password"
 msgstr ""
 
 msgctxt "#30500"
