@@ -63,13 +63,15 @@ def listCat():
 def listCh(url, idCat):
   if(idCat != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
-    digi = DigiApi(deviceIdFile = deviceIdFile)
+    epgFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.epg')
+    digi = DigiApi(deviceIdFile = deviceIdFile, epgFile=epgFile)
     if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       return
     channels = digi.getChannels(idCat)
     for ch in channels:
-      addLink(name = ch['name'].encode('utf8'),
+      activeProgram = digi.getChannelActiveEpg(ch['id'])
+      addLink(name = ch['name'] + (" - " + activeProgram if activeProgram else ""),
               idCh = ch['id'],
               logo = ch['logo'],
               mode = 2)

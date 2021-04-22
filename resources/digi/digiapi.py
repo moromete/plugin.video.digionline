@@ -5,6 +5,8 @@ import hashlib
 import time
 import uuid
 import re
+import datetime
+import json
 
 class DigiApi():
   protocol = 'https'
@@ -15,6 +17,7 @@ class DigiApi():
   deviceOs = "Android"
 
   deviceIdFile = '.deviceId'
+  epgFile = '.epg'
 
   error = None
   errorCode = None
@@ -147,3 +150,47 @@ class DigiApi():
                         'logo': ch['media_channel']['channel_logo_url']
                         })
     return channels
+
+  def getStoredEpg(self):
+    if(os.path.exists(self.epgFile)):
+      f = open(self.epgFile, "r")
+      epg = f.read()
+      f.close()
+      if(len(epg) > 0):
+        return json.loads(epg) 
+  
+  def setStoredEpg(self, epg):
+    f = open(self.epgFile, "w")
+    f.write(epg)
+    f.close()
+  
+  def getEpg(self):
+    epg = self.getStoredEpg()
+    if(epg and epg['data']['date'] == str(datetime.date.today())):
+      return epg
+
+    url = self.apiUrl + '/api/v13/epg.php'
+    params={'date': datetime.date.today(),
+            'duration': 1,
+           }
+    response = requests.get(url, params=params)
+    
+    self.setStoredEpg(response.text)
+
+    epg = response.json()
+    return epg
+  
+  def getChannelEpg(self, idChannel):
+    epg = self.getEpg()
+    if(epg):
+      for ch in epg['data']['channels']:
+        if(str(idChannel) == ch['id_channel']):
+          return ch['epg']
+
+  def getChannelActiveEpg(self, idChannel):
+    now = int(time.time())
+    chEpg = self.getChannelEpg(idChannel)
+    if(chEpg):
+      for programItem in chEpg:
+        if(now >= int(programItem['start_ts']) and now <= int(programItem['end_ts'])):
+          return programItem['program_name'] + " " + programItem['program_description']

@@ -19,7 +19,9 @@ from resources.digi.digiapi import DigiApi
 # print(url)
 
 digi = DigiApi()
-digi.login(sys.argv[1], sys.argv[2])
-print(digi.getCategories())
-print(digi.getChannels(3))
-print(digi.getPlayStream(20))
+# digi.login(sys.argv[1], sys.argv[2])
+# print(digi.getCategories())
+# print(digi.getChannels(3))
+# print(digi.getPlayStream(20))
+# print(digi.getEpg())
+print(digi.getChannelActiveEpg(20))

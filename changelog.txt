@@ -1,3 +1,6 @@
+v 0.3.3
+  1. Add api epg 
+
 v 0.3.2
   1. Android play fix for api mode
 
