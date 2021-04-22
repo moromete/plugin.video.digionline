@@ -124,7 +124,7 @@ class DigiApi():
     print(responseData)
     if(responseData['error']):
       self.error = responseData['error']
-      self.errorCode = re.findall("\((\d+)\)", self.error)[0]
+      self.errorCode = re.findall(r"\((\d+)\)", self.error)[0]
       return False
 
     return responseData['stream']['abr']
