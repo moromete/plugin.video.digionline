@@ -25,6 +25,8 @@ class DigiApi():
   def __init__( self , *args, **kwargs):
     if(kwargs.get('deviceIdFile')):
       self.deviceIdFile=kwargs.get('deviceIdFile')
+    if(kwargs.get('epgFile')):
+      self.deviceIdFile=kwargs.get('epgFile')
 
   def login( self, username, password):
     deviceId = self.getStoredDeviceId()
