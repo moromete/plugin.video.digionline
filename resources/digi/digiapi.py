@@ -1,5 +1,6 @@
 import requests
-from os import path
+import os
+# from os import path
 import hashlib
 import time
 import uuid
@@ -20,6 +21,10 @@ class DigiApi():
       self.deviceIdFile=kwargs.get('deviceIdFile')
 
   def login( self, username, password):
+    deviceId = self.getStoredDeviceId()
+    if(deviceId != None):
+      return
+
     passwordHash = hashlib.md5(password.encode('utf-8')).hexdigest()
     params = {'action': 'registerUser', 
               'user': username, 
@@ -31,17 +36,15 @@ class DigiApi():
     if(responseData['result']['code'] != '200'):
       print(responseData['result']['message'])
       return
-    self.digiOnlineUserHash = responseData['data']['h']
-    print(self.digiOnlineUserHash)
+    digiOnlineUserHash = responseData['data']['h']
+    # print(digiOnlineUserHash)
 
-    self.registerDevice(username, passwordHash)
-    
-    return self.digiOnlineUserHash
+    return self.registerDevice(username, passwordHash, digiOnlineUserHash)
 
-  def registerDevice(self, username, passwordHash):
+  def registerDevice(self, username, passwordHash, digiOnlineUserHash):
     deviceId = self.getDeviceId()
     
-    generate_md5 = hashlib.md5((username + passwordHash + deviceId + self.deviceManufacturer + self.deviceModel + self.deviceOs + self.digiOnlineUserHash).encode('utf-8')).hexdigest()
+    generate_md5 = hashlib.md5((username + passwordHash + deviceId + self.deviceManufacturer + self.deviceModel + self.deviceOs + digiOnlineUserHash).encode('utf-8')).hexdigest()
     # print(generate_md5)
     params = {"action": "registerDevice",
               "user": username,
@@ -59,15 +62,25 @@ class DigiApi():
     if(responseData['result']['code'] != '200'):
       print(responseData['result']['message'])
       return
+    return True
 
-  def getDeviceId(self):
-
-    if(path.exists(self.deviceIdFile)):
+  def getStoredDeviceId(self):
+    if(os.path.exists(self.deviceIdFile)):
       f = open(self.deviceIdFile, "r")
       deviceId = f.read()
       f.close()
       if(len(deviceId) > 0):
         return deviceId 
+  
+  def setStoredDeviceId(self, deviceId):
+    f = open(self.deviceIdFile, "w")
+    f.write(deviceId)
+    f.close()
+  
+  def getDeviceId(self):
+    deviceId = self.getStoredDeviceId()
+    if(deviceId != None):
+      return deviceId
 
     str4 = self.deviceManufacturer + "_" + self.deviceModel + "_" + str(int(time.time()))
     
@@ -82,13 +95,11 @@ class DigiApi():
     str2 = re.sub("[^\\x00-\\x7F]", "_", str2)
     deviceId = str2
 
-    f = open(self.deviceIdFile, "w")
-    deviceId = f.write(deviceId)
-    f.close()
-
+    self.setStoredDeviceId(deviceId)
+    
     return deviceId
 
-  def getPlayStream(self, idStream):
+  def getPlayStream(self, idStream, retry=False):
     url = self.apiUrl + '/api/v13/streams_l_3.php'
     params={'action': "getStream",
             'id_stream': idStream,
@@ -101,6 +112,12 @@ class DigiApi():
            }
     response = requests.get(url, params=params)
     responseData = response.json()
+    print(responseData)
+    if(responseData['error']):
+      if(retry == False):
+        self.error = responseData['error']
+      return False
+
     return responseData['stream']['abr']
 
   def getCategories(self):

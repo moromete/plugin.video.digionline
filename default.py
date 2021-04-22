@@ -154,30 +154,26 @@ def listCh(url, idCat):
                 logo = ch['logo'],
                 mode = 2)
 
-def play(url, name, logo, idCh):
+def play(url, name, logo, idCh, retry=False):
   if(idCh != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
     digi.login(addon.getSetting('username'), addon.getSetting('password'))
     url = digi.getPlayStream(idCh)
-    
+    if(url==False):
+      if(retry == True):
+        xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
+      else: #retry by relogin
+        os.remove(deviceIdFile)
+        play(url, name, logo, idCh, True)
+      return
     player =  xbmc.Player()
     listitem = xbmcgui.ListItem(name)
     listitem.setInfo('video', {'Title': name})
     player.play(url, listitem)
   else:
     addon_log(url)
-
-    # quality = None
-    # arrQualities = ['abr', 'hq', 'mq', 'lq']
-    # if(addon.getSetting('choose_quality') == 'true'):
-    #   dialog = xbmcgui.Dialog()
-    #   quality = dialog.select(addon.getLocalizedString(30018), arrQualities)
-    #   quality = arrQualities[quality]
-    #   # addon_log(quality)
-
     digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
-    #url = digi.scrapPlayUrl(url, quality)
     url = digi.scrapPlayUrl(url)
     if(url['err'] != None):
       addon_log(url['err'])
