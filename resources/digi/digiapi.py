@@ -16,6 +16,9 @@ class DigiApi():
 
   deviceIdFile = '.deviceId'
 
+  error = None
+  errorCode = None
+
   def __init__( self , *args, **kwargs):
     if(kwargs.get('deviceIdFile')):
       self.deviceIdFile=kwargs.get('deviceIdFile')

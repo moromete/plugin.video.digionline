@@ -175,6 +175,10 @@ def play(url, name, logo, idCh, retry=False):
         play(url, name, logo, idCh, True)
       return
     player =  xbmc.Player()
+    osAndroid = xbmc.getCondVisibility('system.platform.android')
+    if(osAndroid):
+      from streamplayer import streamplayer
+      player = streamplayer(fakeRequest=True)
     listitem = xbmcgui.ListItem(name)
     listitem.setInfo('video', {'Title': name})
     player.play(url, listitem)
