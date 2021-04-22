@@ -160,8 +160,9 @@ def play(url, name, logo, idCh, retry=False):
     digi = DigiApi(deviceIdFile = deviceIdFile)
     digi.login(addon.getSetting('username'), addon.getSetting('password'))
     url = digi.getPlayStream(idCh)
-    if(url==False):
-      if(retry == True):
+    if(url==False): #error
+      #Pentru acces la programele transmise prin DigiOnline trebuie sa aveti un serviciu. (303)
+      if(retry == True or digi.errorCode != '303'):
         xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       else: #retry by relogin
         os.remove(deviceIdFile)
