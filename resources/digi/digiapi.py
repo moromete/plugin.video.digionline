@@ -159,7 +159,12 @@ class DigiApi():
       epg = f.read()
       f.close()
       if(len(epg) > 0):
-        return json.loads(epg) 
+        try:
+          jsonEpg = json.loads(epg) 
+          return jsonEpg
+        except:
+          print('error decoding stored epg')
+          return None
   
   def setStoredEpg(self, epg):
     f = open(self.epgFile, "w")
