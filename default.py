@@ -45,7 +45,9 @@ def listCat():
   if(addon.getSetting('api') == 'true'):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
-    digi.login(addon.getSetting('username'), addon.getSetting('password'))
+    if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
+      xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
+      return
     cats = digi.getCategories()
   else:
     if(not addon.getSetting('deviceId') or not addon.getSetting('DOSESSV3PRI') ):
@@ -62,7 +64,9 @@ def listCh(url, idCat):
   if(idCat != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
-    digi.login(addon.getSetting('username'), addon.getSetting('password'))
+    if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
+      xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
+      return
     channels = digi.getChannels(idCat)
     for ch in channels:
       addLink(name = ch['name'].encode('utf8'),
@@ -158,7 +162,9 @@ def play(url, name, logo, idCh, retry=False):
   if(idCh != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
-    digi.login(addon.getSetting('username'), addon.getSetting('password'))
+    if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
+      xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
+      return
     url = digi.getPlayStream(idCh)
     if(url==False): #error
       #Pentru acces la programele transmise prin DigiOnline trebuie sa aveti un serviciu. (303)

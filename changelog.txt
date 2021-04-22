@@ -1,6 +1,7 @@
 v 0.3.1
-  1. retry if device gets unregistered and we get error 304 ("Pentru acces la acest continut trebuie sa aveti abonament la acest serviciu. (304)")
+  1. Retry if device gets unregistered and we get error 304 ("Pentru acces la acest continut trebuie sa aveti abonament la acest serviciu. (304)")
      and register as a new device by relogin
+  2. Display login error messages
 
 v 0.3.0
   1. add api support to enable user an password login

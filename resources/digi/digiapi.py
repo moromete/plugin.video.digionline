@@ -35,7 +35,8 @@ class DigiApi():
     responseData = response.json()
     if(responseData['result']['code'] != '200'):
       print(responseData['result']['message'])
-      return
+      self.error = responseData['result']['message']
+      return False
     digiOnlineUserHash = responseData['data']['h']
     # print(digiOnlineUserHash)
 
@@ -61,7 +62,7 @@ class DigiApi():
     print(responseData)
     if(responseData['result']['code'] != '200'):
       print(responseData['result']['message'])
-      return
+      return False
     return True
 
   def getStoredDeviceId(self):
