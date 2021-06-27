@@ -199,5 +199,5 @@ class DigiApi():
     chEpg = self.getChannelEpg(idChannel)
     if(chEpg):
       for programItem in chEpg:
-        if(now >= int(programItem['start_ts']) and now <= int(programItem['end_ts'])):
+        if(programItem['start_ts'] !=  None and programItem['end_ts'] !=  None and now >= int(programItem['start_ts']) and now <= int(programItem['end_ts'])):
           return programItem['program_name'] + " " + programItem['program_description']
