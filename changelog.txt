@@ -1,3 +1,6 @@
+v 0.3.4
+  1. Fix epg - start or end none 
+
 v 0.3.3
   1. Add api epg 
 
