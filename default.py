@@ -194,7 +194,8 @@ def play(url, name, logo, idCh, retry=False):
     else:
       if '.mpd' in url['url']:
         from inputstreamhelper import Helper  # type: ignore
-        listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
+        listitem = xbmcgui.ListItem(name)
+        listitem.setArt({'thumb': logo})
         listitem.setInfo('video', {'Title': name})
         KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         PROTOCOL = 'mpd'
