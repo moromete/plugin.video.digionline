@@ -266,7 +266,7 @@ def play(url, name, logo, idCh, retry=False):
           from streamplayer import streamplayer
           player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
         listitem = xbmcgui.ListItem(name)
-        listitem.setInfo('video', {'Title': name})
+      listitem.setInfo('video', {'Title': name})
       player.play(url['url'], listitem)
 
 def vtt_to_srt(file):
