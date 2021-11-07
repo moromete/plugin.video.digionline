@@ -192,6 +192,7 @@ def play(url, name, logo, idCh, retry=False):
       addon_log(url['err'])
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
     else:
+      player = xbmc.Player()
       if '.mpd' in url['url']:
         from inputstreamhelper import Helper  # type: ignore
         listitem = xbmcgui.ListItem(name)
@@ -212,6 +213,9 @@ def play(url, name, logo, idCh, retry=False):
         
         if KODI_VERSION_MAJOR >= 19:
           listitem.setProperty('inputstream', is_helper.inputstream_addon)
+          listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+          listitem.setProperty('inputstream.adaptive.license_type', DRM)
+          listitem.setProperty('inputstream.adaptive.license_key', license_key)
         else:
           listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
           listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
