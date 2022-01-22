@@ -209,9 +209,9 @@ def play(url, name, logo, idCh, retry=False):
             listitem.setMimeType(MIME_TYPE)
         
             if KODI_VERSION_MAJOR >= 19:
-                listitem.setProperty('inputstream', is_helper.inputstream_addon)
+                listitem.setProperty('inputstream', is_helper.inputstream_addon) 
             else:
-                listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
+                listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) # compatible with Kodi 18 API
             listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
             listitem.setProperty('inputstream.adaptive.license_type', DRM)
             listitem.setProperty('inputstream.adaptive.license_key', license_key)
