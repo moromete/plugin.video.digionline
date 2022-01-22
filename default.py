@@ -38,7 +38,7 @@ def addLink(name, mode, logo, url=None, idCh = None):
   liz.setArt({'thumb': logo})
   liz.setInfo( type="Video", infoLabels={ "Title": name} )
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
-  #xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
+  xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
   return ok
 
 def listCat():

@@ -333,7 +333,7 @@ class Digi():
     soup = BeautifulSoup(html, "html.parser")
     if page_offset == 'All':
       page_offset = "1200"
-    page_offset=int(page_offset)/12
+    page_offset=int(int(page_offset)/12)
     pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
     pages = []
     if pages_nav:
