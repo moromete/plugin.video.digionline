@@ -9,6 +9,6 @@
     <setting type="sep" />
     <setting id="debug" type="bool" label="30010" default="false"/>
     <setting type="sep" />
-    <setting id="titles_per_page" type="select" label="30500" values="All|12|24|48|60" default="All" />
+    <setting id="titles_per_page" type="select" label="30500" values="All|24|48|72" default="All" />
   </category>
 </settings>

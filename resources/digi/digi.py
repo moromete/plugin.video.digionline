@@ -332,8 +332,8 @@ class Digi():
   def scrapPages(self, html, url, page_offset = 'All'):
     soup = BeautifulSoup(html, "html.parser")
     if page_offset == 'All':
-      page_offset = "1200"
-    page_offset=int(int(page_offset)/12)
+      page_offset = "240000"
+    page_offset=int(int(page_offset)/24)
     pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
     pages = []
     if pages_nav:
