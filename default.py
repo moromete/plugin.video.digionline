@@ -56,7 +56,6 @@ def listCat():
     digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
     html=digi.getPage(digi.siteUrl)
     cats = digi.scrapCats('cats',html,'')
-
   for cat in cats:
     addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), idCat=cat.get("id", None), mode=1)    
 
@@ -194,7 +193,7 @@ def play(url, name, logo, idCh, retry=False):
     else:
       if '.mpd' in url['url']:
         from inputstreamhelper import Helper  # type: ignore
-        listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
+        listitem = xbmcgui.ListItem(name)
         listitem.setInfo('video', {'Title': name})
         KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         PROTOCOL = 'mpd'
@@ -209,51 +208,48 @@ def play(url, name, logo, idCh, retry=False):
             listitem.setContentLookup(False)
             listitem.setMimeType(MIME_TYPE)
         
-        if KODI_VERSION_MAJOR >= 19:
-          listitem.setProperty('inputstream', is_helper.inputstream_addon)
-        else:
-          listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
-          listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-          listitem.setProperty('inputstream.adaptive.license_type', DRM)
-          listitem.setProperty('inputstream.adaptive.license_key', license_key)
-          
-          #  inject subtitles
-          folder = xbmc.translatePath(addon.getAddonInfo('profile'))
-          folder = folder + 'subs' + os.sep
-          
-          #  if inject subtitles is enable cache direct subtitle links if available and set subtitles from cache
-          addon_log("Cache subtitles enabled, downloading and converting subtitles in: " + folder)
-          if not os.path.exists(os.path.dirname(folder)):
-              try:
-                  os.makedirs(os.path.dirname(folder))
-              except OSError as exc:  # Guard against race condition
-                  if exc.errno != errno.EEXIST:
-                      raise
-          try:
-              files = os.listdir(folder)
-              for f in files:
-                  os.remove(folder + f)
-              subtitles = url['subtitles']
-              if len(subtitles) > 0:
-                  subs_paths = []
-                  for sub in subtitles:
-                      addon_log("Processing subtitle language code: " + sub['SubFileName'] + " URL: " + sub['Url'])
-                      r = requests.get(sub['Url'])
-                      with open(folder + sub['SubFileName'] , 'wb') as f:
-                          f.write(r.content)
-                      vtt_to_srt(folder + sub['SubFileName'])
-                      subs_paths.append(folder + sub['SubFileName'])
-                  listitem.setSubtitles(subs_paths)
-                  addon_log("Local subtitles set")
-              else:
-                  addon_log("Inject subtitles error: No subtitles for the media")
-          except KeyError:
-              addon_log("Inject subtitles error: No subtitles key")
-          except Exception:
-              addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
-          
-          xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-          
+            if KODI_VERSION_MAJOR >= 19:
+                listitem.setProperty('inputstream', is_helper.inputstream_addon)
+            else:
+                listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
+            listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+            listitem.setProperty('inputstream.adaptive.license_type', DRM)
+            listitem.setProperty('inputstream.adaptive.license_key', license_key)
+            
+            #  inject subtitles
+            folder = xbmc.translatePath(addon.getAddonInfo('profile'))
+            folder = folder + 'subs' + os.sep
+            
+            #  if inject subtitles is enable cache direct subtitle links if available and set subtitles from cache
+            addon_log("Cache subtitles enabled, downloading and converting subtitles in: " + folder)
+            if not os.path.exists(os.path.dirname(folder)):
+                try:
+                    os.makedirs(os.path.dirname(folder))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+            try:
+                files = os.listdir(folder)
+                for f in files:
+                    os.remove(folder + f)
+                subtitles = url['subtitles']
+                if len(subtitles) > 0:
+                    subs_paths = []
+                    for sub in subtitles:
+                        addon_log("Processing subtitle language code: " + sub['SubFileName'] + " URL: " + sub['Url'])
+                        r = requests.get(sub['Url'])
+                        with open(folder + sub['SubFileName'] , 'wb') as f:
+                            f.write(r.content)
+                        vtt_to_srt(folder + sub['SubFileName'])
+                        subs_paths.append(folder + sub['SubFileName'])
+                    listitem.setSubtitles(subs_paths)
+                    addon_log("Local subtitles set")
+                else:
+                    addon_log("Inject subtitles error: No subtitles for the media")
+            except KeyError:
+                addon_log("Inject subtitles error: No subtitles key")
+            except Exception:
+                addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
       else:
         player =  xbmc.Player()
         osAndroid = xbmc.getCondVisibility('system.platform.android')
@@ -262,7 +258,8 @@ def play(url, name, logo, idCh, retry=False):
           player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
         listitem = xbmcgui.ListItem(name)
         listitem.setInfo('video', {'Title': name})
-      player.play(url['url'], listitem)
+      #player.play(url['url'], listitem)
+      xbmc.Player().play(url['url'], listitem)
 
 def vtt_to_srt(file):
   # Read VTT file
