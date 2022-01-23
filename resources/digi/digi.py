@@ -89,8 +89,10 @@ class Digi():
                       })
 
     elif list_type == 'series':
+      series = []
       series_ = soup.find_all(class_="box box-portrait box-hbo")
-      series = [] 
+      if not series_:
+        series_ = soup.find_all(class_="box box-portrait box-logo")
       if series_:
         for box in series_:
           for cnt in box.contents:
