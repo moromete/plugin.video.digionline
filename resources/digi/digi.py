@@ -142,6 +142,7 @@ class Digi():
     html = self.getPage(self.siteUrl + url)
     # print(html)
     soup = BeautifulSoup(html, "html.parser")
+    PageTitle=soup.find("h1", {"class": "page-title"})
     HBOPLAYboxs = soup.find_all(class_="box")
     boxs = soup.find_all(class_="box-content")
     channels = []
@@ -222,6 +223,22 @@ class Digi():
               chName = re.sub('&quest', '?', chName)
               chName = re.sub('&excl', '!', chName)
               chName = re.sub('&abreve', 'a', chName)
+          
+          if(PageTitle) and (chLink) and ('/seriale' in chUrl):
+            chPageTitle = PageTitle.string
+            chPageTitle = chPageTitle.replace('\\n', '')
+            chPageTitle = re.sub('\s+', ' ', chPageTitle)
+            chPageTitle = re.sub('&period', '.', chPageTitle)
+            chPageTitle = re.sub('&colon', ':', chPageTitle)
+            chPageTitle = re.sub('&comma', ',', chPageTitle)
+            chPageTitle = re.sub('&lpar', '(', chPageTitle)
+            chPageTitle = re.sub('&rpar', ')', chPageTitle)
+            chPageTitle = re.sub('&quest', '?', chPageTitle)
+            chPageTitle = re.sub('&excl', '!', chPageTitle)
+            chPageTitle = re.sub('&abreve', 'a', chPageTitle)
+            chSerieName = chPageTitle.split(" - ")[0]
+            chSeason = chPageTitle.split(", ")[-1]
+            chName= chSerieName + ' - ' + chSeason + ', ' + chName
             
           # logo
           logo = soup.find('div', class_='box-background')
