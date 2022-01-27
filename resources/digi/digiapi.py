@@ -281,7 +281,7 @@ class DigiApi():
                       'StreamType': StreamType,
                       'id': serie['series_id'],
                       'Parentid': idCategory,
-                      'logo': serie['media']['poster_hq'],
+                      'logo': serie['media']['thumbnail_hq'],
                       })       
                      
     if StreamType == "HBO_GO":                            
@@ -293,7 +293,7 @@ class DigiApi():
                       'StreamType': StreamType,
                       'id': serie['series_id'],
                       'Parentid': idCategory,
-                      'logo': serie['media']['poster_hq'],
+                      'logo': serie['media']['thumbnail_hq'],
                       })  
     return series
 
@@ -308,7 +308,7 @@ class DigiApi():
                       'StreamType': StreamType,
                       'id': season['season_id'],
                       'Parentid': idCategory,
-                      'logo': season['media']['poster_hq'],
+                      'logo': season['media']['thumbnail_hq'],
                       })       
                      
     if StreamType == "HBO_GO":                            
@@ -320,7 +320,7 @@ class DigiApi():
                       'StreamType': StreamType,
                       'id': season['season_id'],
                       'Parentid': idCategory,
-                      'logo': season['media']['poster_hq'],
+                      'logo': season['media']['thumbnail_hq'],
                       })  
     return seasons
 
@@ -337,7 +337,7 @@ class DigiApi():
                         'StreamType': StreamType,
                         'id': kid['asset_id'],
                         'Parentid': idCategory,
-                        'logo': kid['media']['poster_hq'],
+                        'logo': kid['media']['thumbnail_hq'],
                         'plot': kid['metadata']['summary_ro'],
                         'DirType': "1"
                         })
@@ -346,7 +346,7 @@ class DigiApi():
                         'StreamType': StreamType,
                         'id': kid['series_id'],
                         'Parentid': idCategory,
-                        'logo': kid['media']['poster_hq'],
+                        'logo': kid['media']['thumbnail_hq'],
                         'DirType': "3"
                         })                          
     return kids

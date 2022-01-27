@@ -217,7 +217,7 @@ def listCh(url, idCat, StreamType, DirType):
                 plot = ch['plot'],
                 mode = 2)
 
-def play(url, name, logo, idCh, StreamType=False, retry=False):
+def play(url, name, logo, idCh, StreamType=None, retry=False):
   if(idCh != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
@@ -235,20 +235,18 @@ def play(url, name, logo, idCh, StreamType=False, retry=False):
         xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       else: #retry by relogin
         os.remove(deviceIdFile)
-        play(url['url'], name, logo, idCh, True)
-      return
-    
+        play(url['url'], name, logo, idCh, StreamType, True)
+      return    
     player =  xbmc.Player()  
+    osAndroid = xbmc.getCondVisibility('system.platform.android')
+    if(osAndroid):
+      from streamplayer import streamplayer
+      player = streamplayer(fakeRequest=True)
+    listitem = xbmcgui.ListItem(name)
     if '.mpd' in url['url']:
-        PlayMPD(url, name, logo, idCh, StreamType)  
-    else:    
-       osAndroid = xbmc.getCondVisibility('system.platform.android')
-       if(osAndroid):
-         from streamplayer import streamplayer
-         player = streamplayer(fakeRequest=True)
-       listitem = xbmcgui.ListItem(name)
-       listitem.setInfo('video', {'Title': name})
-       player.play(url['url'], listitem)
+      listitem=PlayMPD(url, name, logo, idCh, StreamType)  
+    listitem.setInfo('video', {'Title': name})
+    player.play(url['url'], listitem)
        
   else:
     addon_log(url)
@@ -258,18 +256,16 @@ def play(url, name, logo, idCh, StreamType=False, retry=False):
       addon_log(url['err'])
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
     else:
-      player = xbmc.Player()
+      player =  xbmc.Player()
+      osAndroid = xbmc.getCondVisibility('system.platform.android')
+      if(osAndroid):
+        from streamplayer import streamplayer
+        player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
+      listitem = xbmcgui.ListItem(name)
       if '.mpd' in url['url']:
-        PlayMPD(url, name, logo, idCh, StreamType)
-      else:
-        player =  xbmc.Player()
-        osAndroid = xbmc.getCondVisibility('system.platform.android')
-        if(osAndroid):
-          from streamplayer import streamplayer
-          player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
-        listitem = xbmcgui.ListItem(name)
-        listitem.setInfo('video', {'Title': name})
-        player.play(url['url'], listitem)
+        listitem=PlayMPD(url, name, logo, idCh, StreamType)
+      listitem.setInfo('video', {'Title': name})
+      player.play(url['url'], listitem)
 
 def PlayMPD(url, name, logo, idCh, StreamType=False):
   from inputstreamhelper import Helper  # type: ignore
@@ -333,8 +329,9 @@ def PlayMPD(url, name, logo, idCh, StreamType=False):
       addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
   xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
   listitem.setInfo('video', {'Title': name})
-  player =  xbmc.Player()
-  player.play(url['url'], listitem)
+  return listitem
+  #player =  xbmc.Player()
+  #player.play(url['url'], listitem)
   
 def vtt_to_srt(file):
   # Read VTT file
