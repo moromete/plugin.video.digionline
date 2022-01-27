@@ -157,7 +157,20 @@ class Digi():
           chLink = soup.find('a', class_="box-link", href=True)
           if(chLink):
             chUrl = chLink['href']
-
+            Plot=self.scrapPlot(chUrl)
+            if(Plot):
+                PlotTxt = Plot.string
+                PlotTxt = PlotTxt.replace('\\n', '')
+                PlotTxt = re.sub('\s+', ' ', PlotTxt)
+                PlotTxt = re.sub('&period', '.', PlotTxt)
+                PlotTxt = re.sub('&colon', ':', PlotTxt)
+                PlotTxt = re.sub('&comma', ',', PlotTxt)
+                PlotTxt = re.sub('&lpar', '(', PlotTxt)
+                PlotTxt = re.sub('&rpar', ')', PlotTxt)
+                PlotTxt = re.sub('&quest', '?', PlotTxt)
+                PlotTxt = re.sub('&excl', '!', PlotTxt)
+                PlotTxt = re.sub('&abreve', 'a', PlotTxt)
+                
           # name
           chNameNode = soup.find('h2')
           if(chNameNode):
@@ -180,7 +193,8 @@ class Digi():
 
         channels.append({'name': chName,
                          'url': chUrl,
-                         'logo': logoUrl
+                         'logo': logoUrl,
+                         'plot': PlotTxt if Plot else ""
                         })
     
     for box in HBOPLAYboxs:
@@ -193,6 +207,19 @@ class Digi():
           chLink = soup.find('a', class_="box-link", href=True)
           if(chLink):
             chUrl = chLink['href'].replace("https://www.digionline.ro","")
+            Plot=self.scrapPlot(chUrl)
+            if(Plot):
+                PlotTxt = Plot.string
+                PlotTxt = PlotTxt.replace('\\n', '')
+                PlotTxt = re.sub('\s+', ' ', PlotTxt)
+                PlotTxt = re.sub('&period', '.', PlotTxt)
+                PlotTxt = re.sub('&colon', ':', PlotTxt)
+                PlotTxt = re.sub('&comma', ',', PlotTxt)
+                PlotTxt = re.sub('&lpar', '(', PlotTxt)
+                PlotTxt = re.sub('&rpar', ')', PlotTxt)
+                PlotTxt = re.sub('&quest', '?', PlotTxt)
+                PlotTxt = re.sub('&excl', '!', PlotTxt)
+                PlotTxt = re.sub('&abreve', 'a', PlotTxt)
 
           # name
           chNameNode = soup.find('h5')
@@ -249,9 +276,18 @@ class Digi():
             
         channels.append({'name': chName,
                          'url': chUrl,
-                         'logo': logoUrl
+                         'logo': logoUrl,
+                         'plot': PlotTxt if Plot else ""
                         })
     return channels
+
+  def scrapPlot(self, url):
+    html = self.getPage(self.siteUrl + url)
+    # print(html)
+    soup = BeautifulSoup(html, "html.parser")
+    Plot=soup.find("p", {"id": "synopsis"})    
+
+    return Plot
 
   def getCookie(self, name):
     cookies = self.cookies
