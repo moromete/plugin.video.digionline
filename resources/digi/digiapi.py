@@ -206,15 +206,20 @@ class DigiApi():
     for cat in responseData['data']['categories_list']:
       cats.append({'name': cat['category_desc'],
                    'StreamType': "LiveTV",
-                   'id': cat['id_category'],
+                   'id': cat['id_category']
+                  })
+    cats.append({'name': "ALL TV",
+                   'StreamType': "LiveTV",
+                   'DirType': "6",
+                   'id': "root"                   
                   })
     cats.append({'name': "DIGI PLAY",
                    'StreamType': "DIGI_PLAY",
-                   'id': "root",
+                   'id': "root"
                   })
     cats.append({'name': "HBO GO",
                    'StreamType': "HBO_GO",
-                   'id': "root",
+                   'id': "root"
                   })
     return cats
 

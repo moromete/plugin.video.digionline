@@ -119,6 +119,21 @@ def listCh(url, idCat, StreamType, DirType):
                     StreamType=StreamType,
                     mode = 2)
         isdir=1
+
+    if isdir == 0 and DirType == "6":#All TV
+      AllCats = digi.getCategories()
+      for cat in AllCats:
+        if cat['StreamType'] == "LiveTV":
+          channels = digi.getChannels(cat['id'], cat['StreamType'], "1")
+          for ch in channels:
+            activeProgram = digi.getChannelActiveEpg(ch['id'])
+            addLink(name = ch['name']+(" - " + activeProgram[0]['name'] if activeProgram else ""),
+                    idCh = ch['id'],
+                    logo = ch['logo'],
+                    plot= activeProgram[0]['description'] if activeProgram else ch['plot'],
+                    StreamType=StreamType,
+                    mode = 2)
+        isdir=1
         
     if isdir == 0:
       channels = digi.getChannels(idCat, StreamType, DirType)
@@ -413,7 +428,7 @@ try:
 except:
   StreamType=None
 try:
-  DirType=urllib.parse.unquote_plus(params["DirType"])
+  DirType=urllib.parse.unquote_plus(params["DirType"]) ### 1-Movie, 2-Series, 3-Season, 4-Episode, 5-Kids, 6-All TV
 except:
   DirType=None
   
