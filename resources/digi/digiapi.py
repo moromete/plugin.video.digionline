@@ -143,7 +143,8 @@ class DigiApi():
 
   def getStreamMPD(self,idStream,StreamType):
     id_device = self.getDeviceId()
-    ip = requests.get('https://api.ipify.org').text
+    ext_ip = requests.get(self.apiUrl + '/api/v13/ip_info.php').json()
+    ip = ext_ip['data']['ip']
     if StreamType == "DIGI_PLAY":
       url= self.apiUrl + '/api/v12/play_stream_3.php'
       data = {
@@ -160,7 +161,7 @@ class DigiApi():
       }
     response = requests.post(url, headers=self.headers, data = data)
     chData=response.json()
-    print(chData)
+    #print(chData)
     if(chData['error']['error_code'] != 0):
       self.error = chData['error']['error_message']
       self.errorCode = chData['error']['error_code']

@@ -330,8 +330,6 @@ def PlayMPD(url, name, logo, idCh, StreamType=False):
   xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
   listitem.setInfo('video', {'Title': name})
   return listitem
-  #player =  xbmc.Player()
-  #player.play(url['url'], listitem)
   
 def vtt_to_srt(file):
   # Read VTT file

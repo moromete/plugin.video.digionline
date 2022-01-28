@@ -304,7 +304,11 @@ class Digi():
     soup = BeautifulSoup(html, "html.parser")
     player = soup.select("[class*=video] > script")
     if(len(player) == 0):
-      return
+      err = soup.find("h2", {"class": "text-transform-none"})
+      err = err.string
+      if(len(err) != 0): 
+        return {'err': err}
+      return	
     jsonStr = player[0].string.strip()
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
