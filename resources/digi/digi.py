@@ -53,6 +53,10 @@ class Digi():
     if list_type == 'cats':
       categories = soup.findAll("a", {"class": "nav-menu-item-link"})
       cats = []
+      cats.append({'name': "ALL TV",
+             'url': "/toate-canalele",
+             'parent': url
+            })
       for link in categories:
           cats.append({'name': link['title'],
                        'url': link['href'],
@@ -157,20 +161,7 @@ class Digi():
           chLink = soup.find('a', class_="box-link", href=True)
           if(chLink):
             chUrl = chLink['href']
-#            Plot=self.scrapPlot(chUrl)     ##Dureaza prea mult. Activare cu parametru???
-#            if(Plot):
-#                PlotTxt = Plot.string
-#                PlotTxt = PlotTxt.replace('\\n', '')
-#                PlotTxt = re.sub('\s+', ' ', PlotTxt)
-#                PlotTxt = re.sub('&period', '.', PlotTxt)
-#                PlotTxt = re.sub('&colon', ':', PlotTxt)
-#                PlotTxt = re.sub('&comma', ',', PlotTxt)
-#                PlotTxt = re.sub('&lpar', '(', PlotTxt)
-#                PlotTxt = re.sub('&rpar', ')', PlotTxt)
-#                PlotTxt = re.sub('&quest', '?', PlotTxt)
-#                PlotTxt = re.sub('&excl', '!', PlotTxt)
-#                PlotTxt = re.sub('&abreve', 'a', PlotTxt)
-#                
+              
           # name
           chNameNode = soup.find('h2')
           if(chNameNode):
@@ -185,9 +176,13 @@ class Digi():
             chName = re.sub('&quest', '?', chName)
             chName = re.sub('&excl', '!', chName)
             chName = re.sub('&abreve', 'a', chName)
+          else:
+            chNameNode2 = soup.find('img', alt=True)
+            if(chNameNode2):
+              chName = chNameNode2['alt']
           
           # logo
-          logo = soup.find('img', alt="logo", src=True)
+          logo = soup.find('img', src=True)
           if(logo):
             logoUrl = logo['src']
 
@@ -208,19 +203,6 @@ class Digi():
           chLink = soup.find('a', class_="box-link", href=True)
           if(chLink):
             chUrl = chLink['href'].replace("https://www.digionline.ro","")
-#            Plot=self.scrapPlot(chUrl)     ##Dureaza prea mult. Activare cu parametru???
-#            if(Plot):
-#                PlotTxt = Plot.string
-#                PlotTxt = PlotTxt.replace('\\n', '')
-#                PlotTxt = re.sub('\s+', ' ', PlotTxt)
-#                PlotTxt = re.sub('&period', '.', PlotTxt)
-#                PlotTxt = re.sub('&colon', ':', PlotTxt)
-#                PlotTxt = re.sub('&comma', ',', PlotTxt)
-#                PlotTxt = re.sub('&lpar', '(', PlotTxt)
-#                PlotTxt = re.sub('&rpar', ')', PlotTxt)
-#                PlotTxt = re.sub('&quest', '?', PlotTxt)
-#                PlotTxt = re.sub('&excl', '!', PlotTxt)
-#                PlotTxt = re.sub('&abreve', 'a', PlotTxt)
 
           # name
           chNameNode = soup.find('h5')
@@ -278,7 +260,6 @@ class Digi():
         channels.append({'name': chName,
                          'url': chUrl,
                          'logo': logoUrl,
-#                         'plot': PlotTxt if Plot else ""
                          'plot': ""
                         })
     return channels
