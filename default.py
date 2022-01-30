@@ -261,7 +261,6 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
     if '.mpd' in url['url']:
       listitem=PlayMPD(url, name, logo, idCh, StreamType)  
     listitem.setInfo('video', {'Title': name})
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     player.play(url['url'], listitem)
        
   else:
@@ -281,7 +280,6 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
       if '.mpd' in url['url']:
         listitem=PlayMPD(url, name, logo, idCh, StreamType)
       listitem.setInfo('video', {'Title': name})
-      xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
       player.play(url['url'], listitem)
 
 def PlayMPD(url, name, logo, idCh, StreamType=False):
@@ -344,8 +342,6 @@ def PlayMPD(url, name, logo, idCh, StreamType=False):
       addon_log("Inject subtitles error: No subtitles key")
   except Exception:
       addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
-                                                             
-                                            
   return listitem
   
 def vtt_to_srt(file):

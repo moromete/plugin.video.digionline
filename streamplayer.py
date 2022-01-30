@@ -12,7 +12,7 @@ class streamplayer(xbmc.Player):
 
   def __init__(self, *args, **kwargs):
     # self.cookieFile = kwargs.get('cookieFile')
-    if(kwargs.get('deviceIdFile')):
+    if(kwargs.get('deviceId')):
       self.deviceId = kwargs.get('deviceId')
     if(kwargs.get('DOSESSV3PRI')):  
       self.DOSESSV3PRI = kwargs.get('DOSESSV3PRI')

@@ -365,7 +365,7 @@ class Digi():
             subtitles.append({'Url': rooturl + sub, 'SubName': subname, 'SubFileName': subfilename})
       else:
         err = chData['error']['error_message']
-        soup = BeautifulSoup(err)
+        soup = BeautifulSoup(err, "html.parser")
         err = soup.get_text()
     return {'url': url,
             'err': err,
