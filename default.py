@@ -192,9 +192,11 @@ def play(url, name, logo, idCh, retry=False):
       addon_log(url['err'])
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
     else:
+      player = xbmc.Player()
       if '.mpd' in url['url']:
         from inputstreamhelper import Helper  # type: ignore
-        listitem = xbmcgui.ListItem(name, thumbnailImage=logo)
+        listitem = xbmcgui.ListItem(name)
+        listitem.setArt({'thumb': logo})
         listitem.setInfo('video', {'Title': name})
         KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         PROTOCOL = 'mpd'
@@ -211,6 +213,9 @@ def play(url, name, logo, idCh, retry=False):
         
         if KODI_VERSION_MAJOR >= 19:
           listitem.setProperty('inputstream', is_helper.inputstream_addon)
+          listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+          listitem.setProperty('inputstream.adaptive.license_type', DRM)
+          listitem.setProperty('inputstream.adaptive.license_key', license_key)
         else:
           listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
           listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
@@ -261,7 +266,7 @@ def play(url, name, logo, idCh, retry=False):
           from streamplayer import streamplayer
           player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
         listitem = xbmcgui.ListItem(name)
-        listitem.setInfo('video', {'Title': name})
+      listitem.setInfo('video', {'Title': name})
       player.play(url['url'], listitem)
 
 def vtt_to_srt(file):
