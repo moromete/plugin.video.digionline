@@ -241,6 +241,7 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
       return
     if StreamType == "LiveTV":
       url = digi.getPlayStream(idCh)
+      url['url'] += '|User-Agent=kodi'
     else:
       url = digi.getStreamMPD(idCh,StreamType)
     addon_log(url)
@@ -253,11 +254,11 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
         play(url['url'], name, logo, idCh, StreamType, True)
       return    
     player =  xbmc.Player()  
-    osAndroid = xbmc.getCondVisibility('system.platform.android')
-    if(osAndroid):
-      addon_log("Android")
-      from streamplayer import streamplayer
-      player = streamplayer(fakeRequest=True)
+    # osAndroid = xbmc.getCondVisibility('system.platform.android')
+    # if(osAndroid):
+    #   addon_log("Android")
+    #   from streamplayer import streamplayer
+    #   player = streamplayer(fakeRequest=True)
     listitem = xbmcgui.ListItem(name)
     if '.mpd' in url['url']:
       listitem=PlayMPD(url, name, logo, idCh, StreamType)  
@@ -273,10 +274,10 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
     else:
       player =  xbmc.Player()
-      osAndroid = xbmc.getCondVisibility('system.platform.android')
-      if(osAndroid):
-        from streamplayer import streamplayer
-        player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
+    #   osAndroid = xbmc.getCondVisibility('system.platform.android')
+    #   if(osAndroid):
+    #     from streamplayer import streamplayer
+    #     player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
       listitem = xbmcgui.ListItem(name)
       if '.mpd' in url['url']:
         listitem=PlayMPD(url, name, logo, idCh, StreamType)
