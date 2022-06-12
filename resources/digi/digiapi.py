@@ -7,6 +7,7 @@ import uuid
 import re
 import datetime
 import json
+from urllib.parse import urlparse
 
 class DigiApi():
   protocol = 'https'
@@ -126,8 +127,21 @@ class DigiApi():
       self.error = responseData['error']
       self.errorCode = re.findall(r"\((\d+)\)", self.error)[0]
       return False
+    
+    bestPlayUrl = self.getBestPlayStream(responseData['stream']['abr']) 
+    return bestPlayUrl
+    
+    # return responseData['stream']['abr']
 
-    return responseData['stream']['abr']
+  def getBestPlayStream(self, m3u8Url):
+    path = urlparse(m3u8Url)
+    pathParts = path.path.split("/")
+    pathParts.pop()
+    url = path.scheme + "://" + path.netloc + '/'.join(pathParts)
+    response = requests.get(m3u8Url)
+    m = re.search('\n([^#][\w.\/]+.m3u8)', response.text)
+    url = url + "/" + m.group(1)
+    return url
 
   def getCategories(self):
     url = self.apiUrl + '/api/v13/categorieschannels.php'
