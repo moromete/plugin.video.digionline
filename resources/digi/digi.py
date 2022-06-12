@@ -53,6 +53,10 @@ class Digi():
     if list_type == 'cats':
       categories = soup.findAll("a", {"class": "nav-menu-item-link"})
       cats = []
+      cats.append({'name': "ALL TV",
+             'url': "/toate-canalele",
+             'parent': url
+            })
       for link in categories:
           cats.append({'name': link['title'],
                        'url': link['href'],
@@ -89,8 +93,10 @@ class Digi():
                       })
 
     elif list_type == 'series':
+      series = []
       series_ = soup.find_all(class_="box box-portrait box-hbo")
-      series = [] 
+      if not series_:
+        series_ = soup.find_all(class_="box box-portrait box-logo")
       if series_:
         for box in series_:
           for cnt in box.contents:
@@ -140,6 +146,7 @@ class Digi():
     html = self.getPage(self.siteUrl + url)
     # print(html)
     soup = BeautifulSoup(html, "html.parser")
+    PageTitle=soup.find("h1", {"class": "page-title"})
     HBOPLAYboxs = soup.find_all(class_="box")
     boxs = soup.find_all(class_="box-content")
     channels = []
@@ -154,7 +161,7 @@ class Digi():
           chLink = soup.find('a', class_="box-link", href=True)
           if(chLink):
             chUrl = chLink['href']
-
+              
           # name
           chNameNode = soup.find('h2')
           if(chNameNode):
@@ -169,15 +176,21 @@ class Digi():
             chName = re.sub('&quest', '?', chName)
             chName = re.sub('&excl', '!', chName)
             chName = re.sub('&abreve', 'a', chName)
+          else:
+            chNameNode2 = soup.find('img', alt=True)
+            if(chNameNode2):
+              chName = chNameNode2['alt']
           
           # logo
-          logo = soup.find('img', alt="logo", src=True)
+          logo = soup.find('img', src=True)
           if(logo):
             logoUrl = logo['src']
 
         channels.append({'name': chName,
                          'url': chUrl,
-                         'logo': logoUrl
+                         'logo': logoUrl,
+#                         'plot': PlotTxt if Plot else ""
+                         'plot': ""
                         })
     
     for box in HBOPLAYboxs:
@@ -220,6 +233,22 @@ class Digi():
               chName = re.sub('&quest', '?', chName)
               chName = re.sub('&excl', '!', chName)
               chName = re.sub('&abreve', 'a', chName)
+          
+          if(PageTitle) and (chLink) and ('/seriale' in chUrl):
+            chPageTitle = PageTitle.string
+            chPageTitle = chPageTitle.replace('\\n', '')
+            chPageTitle = re.sub('\s+', ' ', chPageTitle)
+            chPageTitle = re.sub('&period', '.', chPageTitle)
+            chPageTitle = re.sub('&colon', ':', chPageTitle)
+            chPageTitle = re.sub('&comma', ',', chPageTitle)
+            chPageTitle = re.sub('&lpar', '(', chPageTitle)
+            chPageTitle = re.sub('&rpar', ')', chPageTitle)
+            chPageTitle = re.sub('&quest', '?', chPageTitle)
+            chPageTitle = re.sub('&excl', '!', chPageTitle)
+            chPageTitle = re.sub('&abreve', 'a', chPageTitle)
+            chSerieName = chPageTitle.split(" - ")[0]
+            chSeason = chPageTitle.split(", ")[-1]
+            chName= chSerieName + ' - ' + chSeason + ', ' + chName
             
           # logo
           logo = soup.find('div', class_='box-background')
@@ -230,9 +259,18 @@ class Digi():
             
         channels.append({'name': chName,
                          'url': chUrl,
-                         'logo': logoUrl
+                         'logo': logoUrl,
+                         'plot': ""
                         })
     return channels
+
+  def scrapPlot(self, url):
+    html = self.getPage(self.siteUrl + url)
+    # print(html)
+    soup = BeautifulSoup(html, "html.parser")
+    Plot=soup.find("p", {"id": "synopsis"})    
+
+    return Plot
 
   def getCookie(self, name):
     cookies = self.cookies
@@ -247,7 +285,11 @@ class Digi():
     soup = BeautifulSoup(html, "html.parser")
     player = soup.select("[class*=video] > script")
     if(len(player) == 0):
-      return
+      err = soup.find("h2", {"class": "text-transform-none"})
+      err = err.string
+      if(len(err) != 0): 
+        return {'err': err}
+      return	
     jsonStr = player[0].string.strip()
     chData = json.loads(jsonStr)
     url = chData['new-info']['meta']['streamUrl']
@@ -323,7 +365,7 @@ class Digi():
             subtitles.append({'Url': rooturl + sub, 'SubName': subname, 'SubFileName': subfilename})
       else:
         err = chData['error']['error_message']
-        soup = BeautifulSoup(err)
+        soup = BeautifulSoup(err, "html.parser")
         err = soup.get_text()
     return {'url': url,
             'err': err,
@@ -332,8 +374,8 @@ class Digi():
   def scrapPages(self, html, url, page_offset = 'All'):
     soup = BeautifulSoup(html, "html.parser")
     if page_offset == 'All':
-      page_offset = "1200"
-    page_offset=int(page_offset)/12
+      page_offset = "240000"
+    page_offset=int(int(page_offset)/24)
     pages_nav = soup.find("nav", {"class": "pagination-wrapper"})
     pages = []
     if pages_nav:
