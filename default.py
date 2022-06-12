@@ -11,13 +11,17 @@ addon = xbmcaddon.Addon(id=addonId)
 logFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), addonId+'.log')
 # cookieFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), 'cookies.txt')
 
-def addDir(name, url, mode, logo = None, idCat = None):
+def addDir(name, url, mode, logo = None, idCat = None, StreamType = None, DirType = None):
   u = sys.argv[0] + "?mode=" + str(mode)
 
   if(url):
     u += "&url=" + urllib.parse.quote_plus(url)
   if(idCat):
     u += "&idCat=" + str(idCat)
+  if(StreamType):
+    u += "&StreamType=" + str(StreamType)
+  if(DirType):
+    u += "&DirType=" + str(DirType)
     
   liz = xbmcgui.ListItem(name)
   if logo:
@@ -26,19 +30,21 @@ def addDir(name, url, mode, logo = None, idCat = None):
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
   return ok
 
-def addLink(name, mode, logo, url=None, idCh = None):
+def addLink(name, mode, logo, plot=None, url=None, idCh = None, StreamType = None):
   u = sys.argv[0] + "?name=" + urllib.parse.quote_plus(name) + \
                     "&logo=" + urllib.parse.quote_plus(logo) +'&mode=' + str(mode)
   if(url):
     u += "&url=" + urllib.parse.quote_plus(url)
   if(idCh):
     u += "&idCh=" + str(idCh)
-
+  if(StreamType):
+    u += "&StreamType=" + str(StreamType)
+    
   liz = xbmcgui.ListItem(name)
   liz.setArt({'thumb': logo})
-  liz.setInfo( type="Video", infoLabels={ "Title": name} )
+  liz.setInfo( type="Video", infoLabels={ "Title": name, "Plot": plot} )
   ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
-  #xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
+  xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
   return ok
 
 def listCat():
@@ -56,11 +62,10 @@ def listCat():
     digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
     html=digi.getPage(digi.siteUrl)
     cats = digi.scrapCats('cats',html,'')
-
   for cat in cats:
-    addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), idCat=cat.get("id", None), mode=1)    
+    addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), idCat=cat.get("id", None), StreamType=cat.get("StreamType", None), DirType=cat.get("DirType", None),mode=1)    
 
-def listCh(url, idCat):
+def listCh(url, idCat, StreamType, DirType):
   if(idCat != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     epgFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.epg')
@@ -68,13 +73,78 @@ def listCh(url, idCat):
     if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       return
-    channels = digi.getChannels(idCat)
-    for ch in channels:
-      activeProgram = digi.getChannelActiveEpg(ch['id'])
-      addLink(name = ch['name'] + (" - " + activeProgram if activeProgram else ""),
-              idCh = ch['id'],
-              logo = ch['logo'],
-              mode = 2)
+
+    isdir = 0
+    submenus = digi.GetSubMenus(idCat, StreamType)
+    for cat in submenus:
+        if cat['Parentid']==idCat and cat['Parentid'] == "root":
+            if cat['name'] == "Filme":
+                DirType = "1"
+            if cat['name'] == "Seriale":
+                DirType = "2"
+            if cat['name'] == "Kids":
+                DirType = "5" 
+            addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType=DirType,mode=1)
+            isdir=1
+    
+    if isdir == 0:
+      subcats = digi.GetSubCats(idCat, StreamType)
+      for cat in subcats:
+        if cat['Parentid']==idCat and cat['id'] != idCat:
+            addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType=DirType,mode=1)
+            isdir=1
+
+    if isdir == 0 and DirType == "2":#Series
+      series = digi.GetSeries(idCat, StreamType)
+      for cat in series:
+        addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get("logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="3",mode=1)
+        isdir=1
+
+    if isdir == 0 and DirType == "3":#Seasons
+      seasons = digi.GetSeasons(idCat, StreamType)
+      for cat in seasons:
+        addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get("logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="4",mode=1)
+        isdir=1
+ 
+    if isdir == 0 and DirType == "5":#Kids
+      kids = digi.GetKidsList(idCat, StreamType)
+      for cat in kids:
+        if cat['DirType']=="3":
+            addDir(name =  cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get("logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType=cat.get("DirType", None),mode=1)      
+        if cat['DirType']=="1":           
+            addLink(name = cat['name'],
+                    idCh = cat['id'],
+                    logo = cat['logo'],
+                    plot= cat['plot'],
+                    StreamType=StreamType,
+                    mode = 2)
+        isdir=1
+
+    if isdir == 0 and DirType == "6":#All TV
+      AllCats = digi.getCategories()
+      for cat in AllCats:
+        if cat['StreamType'] == "LiveTV":
+          channels = digi.getChannels(cat['id'], cat['StreamType'], "1")
+          for ch in channels:
+            activeProgram = digi.getChannelActiveEpg(ch['id'])
+            addLink(name = ch['name']+(" - " + activeProgram[0]['name'] if activeProgram else ""),
+                    idCh = ch['id'],
+                    logo = ch['logo'],
+                    plot= activeProgram[0]['description'] if activeProgram else ch['plot'],
+                    StreamType=StreamType,
+                    mode = 2)
+        isdir=1
+        
+    if isdir == 0:
+      channels = digi.getChannels(idCat, StreamType, DirType)
+      for ch in channels:
+        activeProgram = digi.getChannelActiveEpg(ch['id'])
+        addLink(name = ch['name']+(" - " + activeProgram[0]['name'] if activeProgram else ""),
+                idCh = ch['id'],
+                logo = ch['logo'],
+                plot= activeProgram[0]['description'] if activeProgram else ch['plot'],
+                StreamType=StreamType,
+                mode = 2)
   else:
     addon_log(url)
     digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
@@ -148,6 +218,7 @@ def listCh(url, idCat):
           addLink(name =  ch['name'].encode('utf8'),
                   url =  ch['url'],
                   logo = ch['logo'],
+                  plot = ch['plot'],
                   mode = 2)
         if isdir==0 and lastPageNr>nextPageNr:
           addDir(name =  'Next Page', url=nextPage, mode=1)    
@@ -158,32 +229,40 @@ def listCh(url, idCat):
           addLink(name =  ch['name'].encode('utf8'),
                 url =  ch['url'],
                 logo = ch['logo'],
+                plot = ch['plot'],
                 mode = 2)
 
-def play(url, name, logo, idCh, retry=False):
+def play(url, name, logo, idCh, StreamType=None, retry=False):
   if(idCh != None):
     deviceIdFile = os.path.join(xbmcvfs.translatePath(addon.getAddonInfo('profile')), '.deviceId')
     digi = DigiApi(deviceIdFile = deviceIdFile)
     if(digi.login(addon.getSetting('username'), addon.getSetting('password')) == False):
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       return
-    url = digi.getPlayStream(idCh)
+    if StreamType == "LiveTV":
+      url = digi.getPlayStream(idCh)
+    else:
+      url = digi.getStreamMPD(idCh,StreamType)
+    addon_log(url)
     if(url==False): #error
       #Pentru acces la programele transmise prin DigiOnline trebuie sa aveti un serviciu. (303)
       if(retry == True or digi.errorCode != '303'):
         xbmcgui.Dialog().ok(addon.getLocalizedString(30013), digi.error)
       else: #retry by relogin
         os.remove(deviceIdFile)
-        play(url, name, logo, idCh, True)
-      return
-    player =  xbmc.Player()
+        play(url['url'], name, logo, idCh, StreamType, True)
+      return    
+    player =  xbmc.Player()  
     osAndroid = xbmc.getCondVisibility('system.platform.android')
     if(osAndroid):
       from streamplayer import streamplayer
       player = streamplayer(fakeRequest=True)
     listitem = xbmcgui.ListItem(name)
+    if '.mpd' in url['url']:
+      listitem=PlayMPD(url, name, logo, idCh, StreamType)  
     listitem.setInfo('video', {'Title': name})
-    player.play(url, listitem)
+    player.play(url['url'], listitem)
+       
   else:
     addon_log(url)
     digi = Digi(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
@@ -192,83 +271,79 @@ def play(url, name, logo, idCh, retry=False):
       addon_log(url['err'])
       xbmcgui.Dialog().ok(addon.getLocalizedString(30013), url['err'])
     else:
-      player = xbmc.Player()
+      player =  xbmc.Player()
+      osAndroid = xbmc.getCondVisibility('system.platform.android')
+      if(osAndroid):
+        from streamplayer import streamplayer
+        player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
+      listitem = xbmcgui.ListItem(name)
       if '.mpd' in url['url']:
-        from inputstreamhelper import Helper  # type: ignore
-        listitem = xbmcgui.ListItem(name)
-        listitem.setArt({'thumb': logo})
-        listitem.setInfo('video', {'Title': name})
-        KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        PROTOCOL = 'mpd'
-        DRM = 'com.widevine.alpha'
-        MIME_TYPE = 'application/dash+xml'
-        LICENSE_URL = 'https://wvp-cdn.rcs-rds.ro/proxy'
-        license_headers = 'verifypeer=false'
-        license_key = LICENSE_URL + '|' + license_headers + '|R{SSM}|'
-        is_helper = Helper(PROTOCOL, drm=DRM)
-        if is_helper.check_inputstream():
-            listitem = xbmcgui.ListItem(path=url['url'])
-            listitem.setContentLookup(False)
-            listitem.setMimeType(MIME_TYPE)
-        
-        if KODI_VERSION_MAJOR >= 19:
-          listitem.setProperty('inputstream', is_helper.inputstream_addon)
-          listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-          listitem.setProperty('inputstream.adaptive.license_type', DRM)
-          listitem.setProperty('inputstream.adaptive.license_key', license_key)
-        else:
-          listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
-          listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-          listitem.setProperty('inputstream.adaptive.license_type', DRM)
-          listitem.setProperty('inputstream.adaptive.license_key', license_key)
-          
-          #  inject subtitles
-          folder = xbmc.translatePath(addon.getAddonInfo('profile'))
-          folder = folder + 'subs' + os.sep
-          
-          #  if inject subtitles is enable cache direct subtitle links if available and set subtitles from cache
-          addon_log("Cache subtitles enabled, downloading and converting subtitles in: " + folder)
-          if not os.path.exists(os.path.dirname(folder)):
-              try:
-                  os.makedirs(os.path.dirname(folder))
-              except OSError as exc:  # Guard against race condition
-                  if exc.errno != errno.EEXIST:
-                      raise
-          try:
-              files = os.listdir(folder)
-              for f in files:
-                  os.remove(folder + f)
-              subtitles = url['subtitles']
-              if len(subtitles) > 0:
-                  subs_paths = []
-                  for sub in subtitles:
-                      addon_log("Processing subtitle language code: " + sub['SubFileName'] + " URL: " + sub['Url'])
-                      r = requests.get(sub['Url'])
-                      with open(folder + sub['SubFileName'] , 'wb') as f:
-                          f.write(r.content)
-                      vtt_to_srt(folder + sub['SubFileName'])
-                      subs_paths.append(folder + sub['SubFileName'])
-                  listitem.setSubtitles(subs_paths)
-                  addon_log("Local subtitles set")
-              else:
-                  addon_log("Inject subtitles error: No subtitles for the media")
-          except KeyError:
-              addon_log("Inject subtitles error: No subtitles key")
-          except Exception:
-              addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
-          
-          xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-          
-      else:
-        player =  xbmc.Player()
-        osAndroid = xbmc.getCondVisibility('system.platform.android')
-        if(osAndroid):
-          from streamplayer import streamplayer
-          player = streamplayer(deviceId=addon.getSetting('deviceId'), DOSESSV3PRI=addon.getSetting('DOSESSV3PRI'))
-        listitem = xbmcgui.ListItem(name)
+        listitem=PlayMPD(url, name, logo, idCh, StreamType)
       listitem.setInfo('video', {'Title': name})
       player.play(url['url'], listitem)
 
+def PlayMPD(url, name, logo, idCh, StreamType=False):
+  from inputstreamhelper import Helper  # type: ignore
+  listitem = xbmcgui.ListItem(name)
+  listitem.setArt({'thumb': logo})                                
+  listitem.setInfo('video', {'Title': name})
+  KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
+  PROTOCOL = 'mpd'
+  DRM = 'com.widevine.alpha'
+  MIME_TYPE = 'application/dash+xml'
+  LICENSE_URL = 'https://wvp-cdn.rcs-rds.ro/proxy'
+  license_headers = 'verifypeer=false'
+  license_key = LICENSE_URL + '|' + license_headers + '|R{SSM}|'
+  is_helper = Helper(PROTOCOL, drm=DRM)
+  if is_helper.check_inputstream():
+      listitem = xbmcgui.ListItem(path=url['url'])
+      listitem.setContentLookup(False)
+      listitem.setMimeType(MIME_TYPE)
+  
+  if KODI_VERSION_MAJOR >= 19:
+      listitem.setProperty('inputstream', is_helper.inputstream_addon)
+  else:
+      listitem.setProperty('inputstreamaddon', is_helper.inputstream_addon) 
+  listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+  listitem.setProperty('inputstream.adaptive.license_type', DRM)
+  listitem.setProperty('inputstream.adaptive.license_key', license_key)
+
+  #  inject subtitles
+  folder = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
+  folder = folder + 'subs' + os.sep
+  
+  #  if inject subtitles is enable cache direct subtitle links if available and set subtitles from cache
+  addon_log("Cache subtitles enabled, downloading and converting subtitles in: " + folder)
+  if not os.path.exists(os.path.dirname(folder)):
+      try:
+          os.makedirs(os.path.dirname(folder))
+      except OSError as exc:  # Guard against race condition
+          if exc.errno != errno.EEXIST:
+              raise
+  try:
+      files = os.listdir(folder)
+      for f in files:
+          os.remove(folder + f)
+      subtitles = url['subtitles']
+      if len(subtitles) > 0:
+          subs_paths = []
+          for sub in subtitles:
+              addon_log("Processing subtitle language code: " + sub['SubFileName'] + " URL: " + sub['Url'])
+              r = requests.get(sub['Url'])
+              with open(folder + sub['SubFileName'] , 'wb') as f:
+                  f.write(r.content)
+              vtt_to_srt(folder + sub['SubFileName'])
+              subs_paths.append(folder + sub['SubFileName'])
+          listitem.setSubtitles(subs_paths)
+          addon_log("Local subtitles set")
+      else:
+          addon_log("Inject subtitles error: No subtitles for the media")
+  except KeyError:
+      addon_log("Inject subtitles error: No subtitles key")
+  except Exception:
+      addon_log("Unexpected inject subtitles error: " + traceback.format_exc())
+  return listitem
+  
 def vtt_to_srt(file):
   # Read VTT file
   with open(file) as f:
@@ -346,15 +421,23 @@ try:
   logo=urllib.parse.unquote_plus(params["logo"])
 except:
   logo=None
-
+try:
+  StreamType=urllib.parse.unquote_plus(params["StreamType"])
+except:
+  StreamType=None
+try:
+  DirType=urllib.parse.unquote_plus(params["DirType"]) ### 1-Movie, 2-Series, 3-Season, 4-Episode, 5-Kids, 6-All TV
+except:
+  DirType=None
+  
 if (mode==None): #list categories
   listCat()
 elif (mode==1):  #list channels movies episodes
-  listCh(url = url, idCat=idCat)
+  listCh(url = url, idCat=idCat, StreamType=StreamType, DirType=DirType)
 elif (mode==2):  #play stream
   if xbmc.Player().isPlaying():
     xbmc.Player().stop()
-  play(url = url, name = name, logo=logo, idCh=idCh)
+  play(url = url, name = name, logo=logo, idCh=idCh, StreamType=StreamType)
 
 try:
   deviceId = params["deviceId"]
