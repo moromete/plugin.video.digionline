@@ -255,6 +255,7 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
     player =  xbmc.Player()  
     osAndroid = xbmc.getCondVisibility('system.platform.android')
     if(osAndroid):
+      addon_log("Android")
       from streamplayer import streamplayer
       player = streamplayer(fakeRequest=True)
     listitem = xbmcgui.ListItem(name)
