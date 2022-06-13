@@ -241,7 +241,8 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
       return
     if StreamType == "LiveTV":
       url = digi.getPlayStream(idCh)
-      url['url'] += '|User-Agent=kodi'
+      if(url):
+        url['url'] += '|User-Agent=kodi'
     else:
       url = digi.getStreamMPD(idCh,StreamType)
     addon_log(url)
