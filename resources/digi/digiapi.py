@@ -43,7 +43,7 @@ class DigiApi():
   def login( self, username, password):
     deviceId = self.getStoredDeviceId()
     if(deviceId != None):
-      return True
+      return
 
     passwordHash = hashlib.md5(password.encode('utf-8')).hexdigest()
     params = {'action': 'registerUser', 
@@ -80,7 +80,7 @@ class DigiApi():
     response = requests.get(url, params=params)
     responseData = response.json()
     print(responseData)
-    if(responseData['result']['code'] != '200'):
+    if(responseData['result']['code'] != 200):
       print(responseData['result']['message'])
       self.error = responseData['result']['message']
       return False
