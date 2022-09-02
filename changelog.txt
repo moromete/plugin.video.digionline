@@ -1,3 +1,6 @@
+v 0.3.6
+  
+
 V 0.3.5
   1. Api for digi play and hbo go
   2. Add User-Agent to avoid response 401 on android kodi play 
