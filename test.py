@@ -22,7 +22,14 @@ digi = DigiApi()
 digi.login(sys.argv[1], sys.argv[2])
 # print(digi.getCategories())
 # print(digi.getChannels(3))
-print(digi.getPlayStream(20))
+#filme
+# print(digi.getChannels(4, "LiveTV", None))  
+#HBO
+# print(digi.getStreamMPD(68, None))
+print(digi.getPlayStream(68))
+
+
+# print(digi.getPlayStream(20))
 # print(digi.getEpg())
 #print(digi.getChannelActiveEpg(20))
 #print(digi.getChannelEpg(43))
