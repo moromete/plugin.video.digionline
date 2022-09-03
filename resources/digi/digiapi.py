@@ -144,8 +144,14 @@ class DigiApi():
             self.errorCode = re.findall(r"\((\d+)\)", self.error)[0]
             return False
 
-        bestPlayUrl = self.getBestPlayStream(responseData['stream']['abr'])
-        return {'url': bestPlayUrl, 'proxy': responseData['stream']['proxy']}
+        m = re.search('.m3u8', responseData['stream']['abr'])
+        if (m != None):
+            bestPlayUrl = self.getBestPlayStream(responseData['stream']['abr'])
+            playUrl = bestPlayUrl
+        else:
+            playUrl = responseData['stream']['abr']
+
+        return {'url': playUrl, 'proxy': responseData['stream']['proxy']}
 
     def getBestPlayStream(self, m3u8Url):
         path = urlparse(m3u8Url)
