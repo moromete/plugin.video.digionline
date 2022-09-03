@@ -1,5 +1,5 @@
 v 0.3.6
-  
+  1. fix mpd live tv play (HBO, CINEMAX, FILMNOW, ....)  
 
 V 0.3.5
   1. Api for digi play and hbo go
