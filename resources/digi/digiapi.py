@@ -174,13 +174,13 @@ class DigiApi():
                 'asset_id_play': idStream,
                 'ip': ip
             }
-        elif StreamType == "HBO_GO":
-            url = self.apiUrl + '/integrationapi/v2/hbogo/hbogo_stream.php'
-            data = {
-                'id_device': id_device,
-                'asset_id_hbo': idStream,
-                'ip': ip
-            }
+        # elif StreamType == "HBO_GO":
+        #     url = self.apiUrl + '/integrationapi/v2/hbogo/hbogo_stream.php'
+        #     data = {
+        #         'id_device': id_device,
+        #         'asset_id_hbo': idStream,
+        #         'ip': ip
+        #     }
         response = requests.post(url, headers=self.headers, data=data)
         chData = response.json()
         # print(chData)
@@ -239,10 +239,10 @@ class DigiApi():
                      'StreamType': "DIGI_PLAY",
                      'id': "root"
                      })
-        cats.append({'name': "HBO GO",
-                     'StreamType': "HBO_GO",
-                     'id': "root"
-                     })
+        # cats.append({'name': "HBO GO",
+        #              'StreamType': "HBO_GO",
+        #              'id': "root"
+        #              })
         return cats
 
     def GetSubMenus(self, idCategory, StreamType):
@@ -258,16 +258,16 @@ class DigiApi():
                                   'id': menu['menu_id'],
                                   'Parentid': idCategory,
                                   })
-        if StreamType == "HBO_GO":
-            url = self.apiUrl + '/api/v13/hbogo_categories.php'
-            response = requests.get(url)
-            responseData = response.json()
-            for menu in responseData['data']['menu_hbogo']:
-                menus.append({'name': menu['menu_name'],
-                              'StreamType': StreamType,
-                              'id': menu['menu_id'],
-                              'Parentid': idCategory,
-                              })
+        # if StreamType == "HBO_GO":
+        #     url = self.apiUrl + '/api/v13/hbogo_categories.php'
+        #     response = requests.get(url)
+        #     responseData = response.json()
+        #     for menu in responseData['data']['menu_hbogo']:
+        #         menus.append({'name': menu['menu_name'],
+        #                       'StreamType': StreamType,
+        #                       'id': menu['menu_id'],
+        #                       'Parentid': idCategory,
+        #                       })
         return menus
 
     def GetSubCats(self, idCategory, StreamType):
@@ -284,18 +284,18 @@ class DigiApi():
                                         'id': option['category_id'],
                                         'Parentid': idCategory,
                                         })
-        if StreamType == "HBO_GO":
-            url = self.apiUrl + '/api/v13/hbogo_categories.php'
-            response = requests.get(url)
-            responseData = response.json()
-            for subcat in responseData['data']['menu_hbogo']:
-                for option in subcat['menu_options']:
-                    if subcat['menu_id'] == idCategory:
-                        subcats.append({'name': option['category_name'],
-                                        'StreamType': StreamType,
-                                        'id': option['category_id'],
-                                        'Parentid': idCategory,
-                                        })
+        # if StreamType == "HBO_GO":
+        #     url = self.apiUrl + '/api/v13/hbogo_categories.php'
+        #     response = requests.get(url)
+        #     responseData = response.json()
+        #     for subcat in responseData['data']['menu_hbogo']:
+        #         for option in subcat['menu_options']:
+        #             if subcat['menu_id'] == idCategory:
+        #                 subcats.append({'name': option['category_name'],
+        #                                 'StreamType': StreamType,
+        #                                 'id': option['category_id'],
+        #                                 'Parentid': idCategory,
+        #                                 })
         return subcats
 
     def GetSeries(self, idCategory, StreamType):
@@ -312,17 +312,17 @@ class DigiApi():
                                'logo': serie['media']['thumbnail_hq'],
                                })
 
-        if StreamType == "HBO_GO":
-            url = self.apiUrl + '/api/v13/hbogo_list_series.php?id_category=' + idCategory
-            response = requests.get(url)
-            responseData = response.json()
-            for serie in responseData['data']['list_series']:
-                series.append({'name': serie['metadata']['title_ro'],
-                               'StreamType': StreamType,
-                               'id': serie['series_id'],
-                               'Parentid': idCategory,
-                               'logo': serie['media']['thumbnail_hq'],
-                               })
+        # if StreamType == "HBO_GO":
+        #     url = self.apiUrl + '/api/v13/hbogo_list_series.php?id_category=' + idCategory
+        #     response = requests.get(url)
+        #     responseData = response.json()
+        #     for serie in responseData['data']['list_series']:
+        #         series.append({'name': serie['metadata']['title_ro'],
+        #                        'StreamType': StreamType,
+        #                        'id': serie['series_id'],
+        #                        'Parentid': idCategory,
+        #                        'logo': serie['media']['thumbnail_hq'],
+        #                        })
         return series
 
     def GetSeasons(self, idCategory, StreamType):
@@ -339,44 +339,44 @@ class DigiApi():
                                 'logo': season['media']['thumbnail_hq'],
                                 })
 
-        if StreamType == "HBO_GO":
-            url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + idCategory
-            response = requests.get(url)
-            responseData = response.json()
-            for season in responseData['data']['series']['list_seasons']:
-                seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
-                                'StreamType': StreamType,
-                                'id': season['season_id'],
-                                'Parentid': idCategory,
-                                'logo': season['media']['thumbnail_hq'],
-                                })
+        # if StreamType == "HBO_GO":
+        #     url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + idCategory
+        #     response = requests.get(url)
+        #     responseData = response.json()
+        #     for season in responseData['data']['series']['list_seasons']:
+        #         seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
+        #                         'StreamType': StreamType,
+        #                         'id': season['season_id'],
+        #                         'Parentid': idCategory,
+        #                         'logo': season['media']['thumbnail_hq'],
+        #                         })
         return seasons
 
-    def GetKidsList(self, idCategory, StreamType):
-        kids = []
-        url = self.apiUrl + '/api/v13/hbogo_list_kids.php?id_category=hbogo-kids'
-        response = requests.get(url)
-        responseData = response.json()
+    # def GetKidsList(self, idCategory, StreamType):
+    #     kids = []
+    #     url = self.apiUrl + '/api/v13/hbogo_list_kids.php?id_category=hbogo-kids'
+    #     response = requests.get(url)
+    #     responseData = response.json()
 
-        for kid in responseData['data']['list_kids']:
-            if kid['type'] == "movie":
-                kids.append({'name': kid['metadata']['title_ro'],
-                            'StreamType': StreamType,
-                             'id': kid['asset_id'],
-                             'Parentid': idCategory,
-                             'logo': kid['media']['thumbnail_hq'],
-                             'plot': kid['metadata']['summary_ro'],
-                             'DirType': "1"
-                             })
-            if kid['type'] == "series":
-                kids.append({'name': kid['metadata']['title_ro'],
-                            'StreamType': StreamType,
-                             'id': kid['series_id'],
-                             'Parentid': idCategory,
-                             'logo': kid['media']['thumbnail_hq'],
-                             'DirType': "3"
-                             })
-        return kids
+    #     for kid in responseData['data']['list_kids']:
+    #         if kid['type'] == "movie":
+    #             kids.append({'name': kid['metadata']['title_ro'],
+    #                         'StreamType': StreamType,
+    #                          'id': kid['asset_id'],
+    #                          'Parentid': idCategory,
+    #                          'logo': kid['media']['thumbnail_hq'],
+    #                          'plot': kid['metadata']['summary_ro'],
+    #                          'DirType': "1"
+    #                          })
+    #         if kid['type'] == "series":
+    #             kids.append({'name': kid['metadata']['title_ro'],
+    #                         'StreamType': StreamType,
+    #                          'id': kid['series_id'],
+    #                          'Parentid': idCategory,
+    #                          'logo': kid['media']['thumbnail_hq'],
+    #                          'DirType': "3"
+    #                          })
+    #     return kids
 
     def getChannels(self, idCategory, StreamType, DirType):
         url = self.apiUrl + '/api/v13/categorieschannels.php'
@@ -391,12 +391,12 @@ class DigiApi():
                 url = self.apiUrl + '/api/v13/play_series.php?asset_id=' + \
                     idCategory.split("-")[0]
 
-        if StreamType == "HBO_GO":
-            if DirType == "1":
-                url = self.apiUrl + '/api/v13/hbogo_list_movies.php?id_category=' + idCategory
-            if DirType == "4":
-                url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + \
-                    idCategory.split("-")[0]
+        # if StreamType == "HBO_GO":
+        #     if DirType == "1":
+        #         url = self.apiUrl + '/api/v13/hbogo_list_movies.php?id_category=' + idCategory
+        #     if DirType == "4":
+        #         url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + \
+        #             idCategory.split("-")[0]
         response = requests.get(url)
         responseData = response.json()
         channels = []
@@ -427,23 +427,23 @@ class DigiApi():
                                              'plot': episode['metadata']['summary_ro']
                                              })
 
-        if StreamType == "HBO_GO":
-            if DirType == "1":  # Movies
-                for ch in responseData['data']['list_movies']:
-                    channels.append({'name': ch['metadata']['title_ro'],
-                                    'id': ch['asset_id'],
-                                     'logo': ch['media']['thumbnail_hq'],
-                                     'plot': ch['metadata']['summary_ro']
-                                     })
-            if DirType == "4":  # Episodes
-                for season in responseData['data']['series']['list_seasons']:
-                    if season['season_id'] == idCategory:
-                        for episode in season['list_episodes']:
-                            channels.append({'name': episode['metadata']['title_ro'],
-                                            'id': episode['asset_id'],
-                                             'logo': episode['media']['thumbnail_hq'],
-                                             'plot': episode['metadata']['summary_ro']
-                                             })
+        # if StreamType == "HBO_GO":
+        #     if DirType == "1":  # Movies
+        #         for ch in responseData['data']['list_movies']:
+        #             channels.append({'name': ch['metadata']['title_ro'],
+        #                             'id': ch['asset_id'],
+        #                              'logo': ch['media']['thumbnail_hq'],
+        #                              'plot': ch['metadata']['summary_ro']
+        #                              })
+        #     if DirType == "4":  # Episodes
+        #         for season in responseData['data']['series']['list_seasons']:
+        #             if season['season_id'] == idCategory:
+        #                 for episode in season['list_episodes']:
+        #                     channels.append({'name': episode['metadata']['title_ro'],
+        #                                     'id': episode['asset_id'],
+        #                                      'logo': episode['media']['thumbnail_hq'],
+        #                                      'plot': episode['metadata']['summary_ro']
+        #                                      })
         return channels
 
     def getStoredEpg(self):

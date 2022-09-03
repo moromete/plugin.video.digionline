@@ -131,20 +131,20 @@ def listCh(url, idCat, StreamType, DirType):
                     "logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="4", mode=1)
                 isdir = 1
 
-        if isdir == 0 and DirType == "5":  # Kids
-            kids = digi.GetKidsList(idCat, StreamType)
-            for cat in kids:
-                if cat['DirType'] == "3":
-                    addDir(name=cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get("logo", None), idCat=cat.get(
-                        "id", None),  StreamType=cat.get("StreamType", None), DirType=cat.get("DirType", None), mode=1)
-                if cat['DirType'] == "1":
-                    addLink(name=cat['name'],
-                            idCh=cat['id'],
-                            logo=cat['logo'],
-                            plot=cat['plot'],
-                            StreamType=StreamType,
-                            mode=2)
-                isdir = 1
+        # if isdir == 0 and DirType == "5":  # Kids
+        #     kids = digi.GetKidsList(idCat, StreamType)
+        #     for cat in kids:
+        #         if cat['DirType'] == "3":
+        #             addDir(name=cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get("logo", None), idCat=cat.get(
+        #                 "id", None),  StreamType=cat.get("StreamType", None), DirType=cat.get("DirType", None), mode=1)
+        #         if cat['DirType'] == "1":
+        #             addLink(name=cat['name'],
+        #                     idCh=cat['id'],
+        #                     logo=cat['logo'],
+        #                     plot=cat['plot'],
+        #                     StreamType=StreamType,
+        #                     mode=2)
+        #         isdir = 1
 
         if isdir == 0 and DirType == "6":  # All TV
             AllCats = digi.getCategories()
