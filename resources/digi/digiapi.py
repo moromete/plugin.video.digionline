@@ -144,8 +144,7 @@ class DigiApi():
             self.errorCode = re.findall(r"\((\d+)\)", self.error)[0]
             return False
 
-        m = re.search('.m3u8', responseData['stream']['abr'])
-        if (m != None):
+        if '.m3u8' in responseData['stream']['abr']:
             bestPlayUrl = self.getBestPlayStream(responseData['stream']['abr'])
             playUrl = bestPlayUrl
         else:

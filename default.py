@@ -297,7 +297,7 @@ def play(url, name, logo, idCh, StreamType=None, retry=False):
         #   from streamplayer import streamplayer
         #   player = streamplayer(fakeRequest=True)
         listitem = xbmcgui.ListItem(name)
-        if '.mpd' in url['url'] or url['proxy']:
+        if '.mpd' in url['url']:
             listitem = PlayMPD(url, name, logo, idCh, StreamType)
         listitem.setInfo('video', {'Title': name})
         player.play(url['url'], listitem)
