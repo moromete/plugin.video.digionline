@@ -10,6 +10,8 @@ import json
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
+from common import addon_log
+
 
 class DigiApi():
     protocol = 'https'
@@ -276,6 +278,7 @@ class DigiApi():
             url = self.apiUrl + '/api/v13/play_categories.php'
             response = requests.get(url)
             responseData = response.json()
+            addon_log(responseData)
             for subcat in responseData['data']['menu_play']:
                 for option in subcat['menu_options']:
                     if subcat['menu_id'] == idCategory:
@@ -325,32 +328,32 @@ class DigiApi():
         #                        })
         return series
 
-    def GetSeasons(self, idCategory, StreamType):
-        seasons = []
-        if StreamType == "DIGI_PLAY":
-            url = self.apiUrl + '/api/v13/play_series.php?asset_id=' + idCategory
-            response = requests.get(url)
-            responseData = response.json()
-            for season in responseData['data']['series']['list_seasons']:
-                seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
-                                'StreamType': StreamType,
-                                'id': season['season_id'],
-                                'Parentid': idCategory,
-                                'logo': season['media']['thumbnail_hq'],
-                                })
+    # def GetSeasons(self, idCategory, StreamType):
+    #     seasons = []
+    #     if StreamType == "DIGI_PLAY":
+    #         url = self.apiUrl + '/api/v13/play_series.php?asset_id=' + idCategory
+    #         response = requests.get(url)
+    #         responseData = response.json()
+    #         for season in responseData['data']['series']['list_seasons']:
+    #             seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
+    #                             'StreamType': StreamType,
+    #                             'id': season['season_id'],
+    #                             'Parentid': idCategory,
+    #                             'logo': season['media']['thumbnail_hq'],
+    #                             })
 
-        # if StreamType == "HBO_GO":
-        #     url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + idCategory
-        #     response = requests.get(url)
-        #     responseData = response.json()
-        #     for season in responseData['data']['series']['list_seasons']:
-        #         seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
-        #                         'StreamType': StreamType,
-        #                         'id': season['season_id'],
-        #                         'Parentid': idCategory,
-        #                         'logo': season['media']['thumbnail_hq'],
-        #                         })
-        return seasons
+    #     # if StreamType == "HBO_GO":
+    #     #     url = self.apiUrl + '/api/v13/hbogo_series.php?asset_id=' + idCategory
+    #     #     response = requests.get(url)
+    #     #     responseData = response.json()
+    #     #     for season in responseData['data']['series']['list_seasons']:
+    #     #         seasons.append({'name': season['metadata']['title_ro']+" - "+season['slug'].split("/")[-1].replace("-", " ").upper(),
+    #     #                         'StreamType': StreamType,
+    #     #                         'id': season['season_id'],
+    #     #                         'Parentid': idCategory,
+    #     #                         'logo': season['media']['thumbnail_hq'],
+    #     #                         })
+    #     return seasons
 
     # def GetKidsList(self, idCategory, StreamType):
     #     kids = []

@@ -67,6 +67,10 @@ msgctxt "#30024"
 msgid "Password"
 msgstr ""
 
+msgctxt "#30025"
+msgid "Reset device"
+msgstr ""
+
 msgctxt "#30500"
 msgid "No. of titles per page"
 msgstr ""
