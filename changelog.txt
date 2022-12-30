@@ -1,3 +1,6 @@
+v 0.3.8
+  1. fix digi play series
+
 v 0.3.7
   1. add reset device setting to delete .deviceId file and register as new device
   2. remove HBO GO menu   

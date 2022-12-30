@@ -4,9 +4,9 @@
     <setting label="30021" type="bool" id="api" default="true"/>
     <setting visible="eq(-1,true)" id="username" type="text" label="30023" default=""/>
     <setting visible="eq(-2,true)" id="password" type="text" label="30024" default="" option="hidden"/>
-    <setting id="resetDevice" type="bool" label="30025" default="false"/>
-    <setting visible="!eq(-3,true)" id="deviceId" type="text" label="30011" default=""/>
-    <setting visible="!eq(-4,true)" id="DOSESSV3PRI" type="text" label="30012" default=""/>
+    <setting visible="eq(-3,true)" id="resetDevice" type="bool" label="30025" default="false"/>
+    <setting visible="!eq(-4,true)" id="deviceId" type="text" label="30011" default=""/>
+    <setting visible="!eq(-5,true)" id="DOSESSV3PRI" type="text" label="30012" default=""/>
     <setting type="sep" />
     <setting id="debug" type="bool" label="30010" default="false"/>
     <setting type="sep" />

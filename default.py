@@ -131,12 +131,12 @@ def listCh(url, idCat, StreamType, DirType):
                     "logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="3", mode=1)
                 isdir = 1
 
-        # if isdir == 0 and DirType == "3":  # Seasons
-        #     seasons = digi.GetSeasons(idCat, StreamType)
-        #     for cat in seasons:
-        #         addDir(name=cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get(
-        #             "logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="4", mode=1)
-        #         isdir = 1
+        if isdir == 0 and DirType == "3":  # Seasons
+            seasons = digi.GetSeasons(idCat, StreamType)
+            for cat in seasons:
+                addDir(name=cat['name'].encode('utf8'), url=cat.get("url", None), logo=cat.get(
+                    "logo", None), idCat=cat.get("id", None),  StreamType=cat.get("StreamType", None), DirType="4", mode=1)
+                isdir = 1
 
         # if isdir == 0 and DirType == "5":  # Kids
         #     kids = digi.GetKidsList(idCat, StreamType)
