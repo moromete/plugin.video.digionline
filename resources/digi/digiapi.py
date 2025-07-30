@@ -495,9 +495,13 @@ class DigiApi():
         chEpg = self.getChannelEpg(idChannel)
         if (chEpg):
             for programItem in chEpg:
+                addon_log(programItem)
                 if (programItem['start_ts'] != None and programItem['end_ts'] != None and now >= int(programItem['start_ts']) and now <= int(programItem['end_ts'])):
                     ActiveEpg = []
+                    description = programItem['program_description']
+                    if (programItem['program_description_l'] != None and len(programItem['program_description_l']) > 0):
+                        description += "\n" + programItem['program_description_l']
                     ActiveEpg.append({'name': programItem['program_name'],
-                                      'description': programItem['program_description'] + "\n" + programItem['program_description_l']
+                                      'description': description 
                                       })
                     return ActiveEpg
